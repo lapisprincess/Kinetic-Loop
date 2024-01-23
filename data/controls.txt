@@ -1,0 +1,18 @@
+### MOVEMENT ###
+
+move_north  = K_UP
+move_south  = K_DOWN
+move_east   = K_LEFT
+move_west   = K_RIGHT
+
+move_north-east = KMOD_SHIFT & K_UP
+move_north-west = KMOD_SHIFT & K_LEFT
+move_south-east = KMOD_SHIFT & K_RIGHT
+move_south-west = KMOD_SHIFT & K_DOWN
+
+
+### MENUS ###
+
+menu_main       = K_ESCAPE
+menu_inventory  = K_i
+menu_player     = K_AT
