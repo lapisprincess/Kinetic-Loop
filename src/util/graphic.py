@@ -25,14 +25,10 @@ for anything that needs an affiliated tile.
 Instance variables:
     - self.tile
 '''
-class Graphic(pg.surface.Surface):
-    def __init__(
-        self, 
-        sheet_coord,        # tile coord in tilesheet   : (int,int)
-        bgc=None, fgc=None  # graphic colors            : pg.Color
-    ): 
+class Graphic(pg.Surface):
+    def __init__(self, sheet_coord, bgc=None, fgc=None): 
         # initialize blank surface
-        pg.surface.Surface.__init__(self, (tile_width, tile_width))
+        pg.Surface.__init__(self, (tile_width, tile_width))
 
         # adjust tile coordinates to match spritesheet dimensions
         # then crop full tileset by taking specified subsurface
@@ -54,6 +50,11 @@ class Graphic(pg.surface.Surface):
     def set_bgc(self, color):
         self.fill(color)
         self.blit(self.tile, (0,0))
+
+
+
+
+
 
 
 ### TILE SAMPLER FUNCTION ###

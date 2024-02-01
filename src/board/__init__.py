@@ -2,9 +2,10 @@
 import pygame as pg
 import random
 
-import graphic
+import util.graphic as graphic
 
-from board.entity.player import Player
+from board.room import Room
+from entity.player import Player
 
 
 ### BOARD CLASS ###
@@ -12,105 +13,103 @@ from board.entity.player import Player
 The board class is the 'system', the glue that keeps everything together.
 Ideally coordinates everything and has tools like pathfinding algos
 and dungeon generation!
-Also manages the entity, tile, and object subclasses, all of which depend
-on information stored by the board.
 
 Instance variables:
     - tiles, entities       # sprite groups holding tiles/entities  : pg.Group
     - screen_x, screen_y    # where on the screen to draw the board : int
 '''
-class Board():
-    def __init__(self, screen_coord):
-        # initialize our two sprite groups
-        self.tiles, self.entities = pg.sprite.Group(), pg.sprite.Group()
-        self.screen_x, self.screen_y = screen_coord[0], screen_coord[1]
+class Board(pg.Rect):
+    def __init__(self, controls, tile_width, dimensions):
+        self.controls, self.tile_width = controls, tile_width
+        self.rooms = []
+        self.tiles = pg.sprite.Group()
+        self.entities = pg.sprite.Group()
+        pg.Rect.__init__(self, (0, 0), dimensions)
 
     def draw(self, surface):
+        for room in self.rooms: room.tiles.draw(surface)
         self.tiles.draw(surface)
         self.entities.draw(surface)
 
-    '''
-    Update method which both keeps everything coordinated spacially and
-    logically, and also handles grabbing inputs for the player to handle
-    (if one exists). The param check_input is used to avoid key repeats.
-
-    @param check_input  # whether we can check for inputs   : bool
-    '''
     def update(self, check_input = False):
         # keep background color consistent between entities and tiles
         for entity in self.entities.sprites():
             tile_bgc = self.get_tile(entity.tile_x, entity.tile_y).bgc
             entity.image.set_bgc(tile_bgc)
 
-        # everything needs to align with the board
-        for sprite in (self.tiles.sprites() + self.entities.sprites()):
-            sprite.rect.x = self.screen_x + sprite.tile_x * graphic.tile_width
-            sprite.rect.y = self.screen_y + sprite.tile_y * graphic.tile_width
-
         if not check_input: return
-
-        keys = pg.key.get_pressed()
         for entity in self.entities.sprites():
             if type(entity) == Player:
-                if entity.process_input(keys, self): self.__update()
+                if entity.process_input(self.controls, self): self.__update()
 
-    '''
-    Standard version of update which ticks all entities and tiles once.
-    '''
     def __update(self):
+        for room in self.rooms: room.update()
         self.entities.update()
         self.tiles.update()
 
-    '''
-    Given x,y tile coordinates, return tile located there, if any.
-    @param tile_x, tile_y   # x,y coord of tile on board    : int
-    @return                 # tile at x,y coord, or None    : Tile
-    '''
+
     def get_tile(self, tile_x, tile_y):
         for tile in self.tiles.sprites():
-            if tile.tile_x == tile_x and tile.tile_y == tile_y:
-                return tile
+            if tile.tile_x == tile_x and tile.tile_y == tile_y: return tile
+        for room in self.rooms:
+            x, y = room.tile_coord[0], room.tile_coord[1]
+            w, h = room.dimension[0],  room.dimension[1]
+            if (tile_x in range(x, x+w)) or (tile_y in range(y, y+h)):
+                return room.get_tile(tile_x, tile_y)
         return None
 
-    '''
-    Method which picks a random floor tile to return.
-    '''
     def get_random_floor(self):
-        floors = []
-        for tile in self.tiles.sprites():
-            if tile.tile_type == 'floor': floors.append(tile)
-        chosen_tile = floors[random.randint(0, len(floors)-1)]
-        return floors[random.randint(0, len(floors)-1)]
+        chosen_room = self.rooms[random.randint(0, len(self.rooms)-1)]
+        return chosen_room.get_random_floor()
 
+    def build_room(self, tile_coord, dimension, floor, wall):
+        if dimension[0] <= 2 or dimension[1] <= 2: return None
+        new_room = Room(tile_coord, dimension, floor, wall)
+        for existing_room in self.rooms:
+            if new_room.colliderect(existing_room): return None
+        self.rooms.append(new_room)
+        return new_room
 
-    '''
-    The build_room method should build a room at (tile_x, tile_y) of
-    given width and height. We start by defining the extremities as the
-    specified wall type, then fill the interior with the floor type.
-    If no floor or wall type is specified, we instead use pre-defined tiles.
-    '''
-    def build_room(self, coord, dimension, floor, wall):
-        tile_x, tile_y = coord[0], coord[1]
-        width, height = dimension[0], dimension[1]
-        for y in range(tile_y, tile_y + height + 1):
-            for x in range(tile_x, tile_x + width + 1):
-                if self.get_tile(x, y) != None: return False
-        width += 1
-        height += 1
+    # returns a list of partitioned rectangles 
+    def bsp(self, levels):
+        out = [self.Partition(self)]
+        i = 0
+        while i <= levels:
+            for i in range(0, len(out)):
+                new_partitions = out[i].split(3, self.tile_width)
+                if new_partitions != None: 
+                    for new_partition in new_partitions: out.append(new_partition)
+                    out.remove(out[i])
+            i+=1
+        return out
 
-        # define walls
-        for i in range(tile_x, tile_x + width):
-            self.tiles.add(wall.clone(i, tile_y))
-        for i in range(tile_x, tile_x + width):
-            self.tiles.add(wall.clone(i, tile_y + height))
-        for i in range(tile_y, tile_y + height):
-            self.tiles.add(wall.clone(tile_x, i))
-        for i in range(tile_y, tile_y + height + 1):
-            self.tiles.add(wall.clone(tile_x + width, i))
+    class Partition(pg.Rect):
+        def split(self, min_room_width_tiles, tile_width):
+            min_room_width = min_room_width_tiles * tile_width
+            if random.randint(0,1): # horizontal split
+                deviance = round(self.width / min_room_width)
+                rand = random.randint(1, deviance)
+                size_a = rand * (self.width / (deviance + 1))
+                size_b = self.width - size_a
+                subpartition_a = Board.Partition(
+                    self.left, self.top, 
+                    size_a, self.height)
+                subpartition_b = Board.Partition(
+                    self.left + size_a, self.top, 
+                    size_b, self.height)
+            else: # vertical split
+                deviance = round(self.height / min_room_width)
+                rand = random.randint(1, deviance)
+                size_a = rand * (self.height / (deviance + 1))
+                size_b = self.height - size_a
+                subpartition_a = Board.Partition(
+                    self.left, self.top, 
+                    self.width, size_a)
+                subpartition_b = Board.Partition(
+                    self.left, self.top + size_a,
+                    self.width, size_b)
+            if size_a < min_room_width or size_b < min_room_width: return None
+            return (subpartition_a, subpartition_b)
 
-        # fill in floor
-        for y in range(tile_y + 1, tile_y + height):
-            for x in range(tile_x + 1, tile_x + width):
-                self.tiles.add(floor.clone(x, y))
-
-        return True
+        def build_room(self, board, floor, wall):
+            None

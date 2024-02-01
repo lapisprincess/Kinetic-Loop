@@ -1,14 +1,24 @@
 ### MOVEMENT ###
 
-move_north  = K_UP
-move_south  = K_DOWN
-move_east   = K_LEFT
-move_west   = K_RIGHT
+### VIM CONTROLS ###
+north  = K_k
+south  = K_j
+east   = K_l
+west   = K_h
+north-east = K_u
+north-west = K_y
+south-east = K_n
+south-west = K_b
 
-move_north-east = KMOD_SHIFT & K_UP
-move_north-west = KMOD_SHIFT & K_LEFT
-move_south-east = KMOD_SHIFT & K_RIGHT
-move_south-west = KMOD_SHIFT & K_DOWN
+### LEGACY CONTROLS ###
+# north  = K_UP
+# south  = K_DOWN
+# east   = K_RIGHT
+# west   = K_LEFT
+# north-east = K_LSHIFT & K_UP
+# north-west = K_LSHIFT & K_LEFT
+# south-east = K_LSHIFT & K_RIGHT
+# south-west = K_LSHIFT & K_DOWN
 
 
 ### MENUS ###

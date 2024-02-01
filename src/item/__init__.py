@@ -1,7 +1,7 @@
 ### IMPORTS ###
 import pygame as pg
 
-import graphic
+import util.graphic as graphic
 
 
 class Item():
