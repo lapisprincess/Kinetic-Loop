@@ -1,4 +1,4 @@
-# Kinetic Loop
+# Leaflings
 
 My attempt at creating a [roguelike](https://roguebasin.com/index.php/Main_Page) using [python](https://www.python.org/)
 and the [pygame](https://www.pygame.org/) module.
