@@ -38,3 +38,6 @@ class Player(Entity):
                 self.move(move, board)
                 return True
         return False
+
+    def update(self):
+        Entity.update(self)

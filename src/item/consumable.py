@@ -1,14 +1,14 @@
 ### IMPORTS ###
 import pygame as pg
 
-import item
+from item import Item
 
 
 ### CONSUMABLE CLASS ###
 '''
 
 '''
-class Consumable(item.Item):
+class Consumable(Item):
     def __init__(
         self,
         item_id='',         # id code                           : str
@@ -16,7 +16,7 @@ class Consumable(item.Item):
         fgc=None,           # tile colors                       : pg.Color
         charge=-1           # number of times it can be used    : int
     ):
-        item.Item.__init__(self, item_id, sheet_coord, fgc)
+        Item.__init__(self, item_id, sheet_coord, fgc)
         self.charge = charge
 
     def consume(self) -> bool:

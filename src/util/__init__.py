@@ -1,18 +1,3 @@
-controls_path = "controls.txt"
-needed_controls = [
-    'north', 'south', 'east', 'west',
-    'north-east', 'north-west',
-    'south-east', 'south-west',
-    'menu_main', 'menu_inventory', 'menu_player'
-]
-def define_controls(data_path):
-    return define(data_path, controls_path, needed_controls, True)
-
-settings_path = "settings.txt"
-needed_settings = ['screen_width', 'screen_height']
-def define_settings(data_path):
-    return define(data_path, settings_path, needed_settings)
-
 def define(data_path, file_path, options, lists = False):
     file = open(data_path + file_path, 'r')
     out = {}
@@ -31,3 +16,20 @@ def define(data_path, file_path, options, lists = False):
         out[command] = mapped_keys
     file.close()
     return out
+
+### CONTROLS ###
+controls_path = "controls.txt"
+needed_controls = [
+    'north', 'south', 'east', 'west',
+    'north-east', 'north-west',
+    'south-east', 'south-west',
+    'menu_main', 'menu_inventory', 'menu_player'
+]
+def define_controls(data_path):
+    return define(data_path, controls_path, needed_controls, True)
+
+### SETTINGS ###
+settings_path = "settings.txt"
+needed_settings = ['screen_width', 'screen_height']
+def define_settings(data_path):
+    return define(data_path, settings_path, needed_settings)
