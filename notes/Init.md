@@ -1,0 +1,1 @@
+When the game first opens, there are a couple of opening calls that need to be made. For instance, the controls need to be initialized
