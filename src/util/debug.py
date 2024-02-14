@@ -1,4 +1,5 @@
 def debug():
+    # prompt user
     prompt = input("\n> ") + " "
     command = prompt.split()
     params, command = command[1:], command[0]
@@ -16,7 +17,7 @@ def debug():
                 (params[0], params[1]), 
                 (params[2], params[3]), 
                 tile.cobble_floor, tile.cobble_wall
-            ) # cond allows us to report whether build was successful
+            )
             if cond: print("success!")
             else: print("failed to build room!")
 

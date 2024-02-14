@@ -6,54 +6,66 @@ from board.tile import Tile
 
 # board gets mutated to fit los; seer stays constant
 def fov_los(board, seer, pixel_max_dist):
-    for tile in board.get_everything():
-        tile.visible = False
-    for tile in board.get_everything_within_range((seer.tile_x, seer.tile_y), 0.5):
-        tile.visible = True
-        #if tile.visible == True: continue
-        visible_tiles = _line(board, seer, tile)
-        for line_tile in visible_tiles: line_tile.visible = True
+    # start by making everything invisible
+    for tile in board.get_everything(): tile.visible = False
+
+    # draw a line from seer to every tile within sight
+    seer_coord = (seer.tile_x, seer.tile_y) 
+    for tile in board.get_everything_within_range(seer_coord, 0.5):
+        tile_coord = (tile.tile_x, tile.tile_y)
+        visible_tiles = bresenham_line(seer_coord, tile_coord)
+        for tile in visible_tiles:
+            tile_obj = board.get_tile(tile[0], tile[1])
+            if tile_obj != None: 
+                tile_obj.visible = True
+                if tile_obj.tile_type == 'wall': break
+            ent_obj = board.get_entity(tile[0], tile[1])
+            if ent_obj != None: ent_obj.visible = True
+
+    # make sure seer stays visible
     seer.visible = True
+    
 
+# shamelessly stolen from rogue basin
+# https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python
+def bresenham_line(start, end):
+    x1, y1 = start
+    x2, y2 = end
+    dx = x2 - x1
+    dy = y2 - y1
 
-# pixel_coord is a tuple defined as (x, y)
-def _line(board, source, dest):
-    x_src, x_dst = source.tile_x, dest.tile_x
-    y_src, y_dst = source.tile_y, dest.tile_y
+    # check line steepness, rotate accordingly
+    is_steep = abs(dy) > abs(dx)
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
 
-    line_direction = direction.match_direction((x_src, y_src), (x_dst, y_dst))
-    dx = abs(x_src - x_dst)
-    dy = abs(y_src - y_dst)
+    # swap values if necessary
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
 
-    out = set()
-    if dx == 0 and dy == 0:
-        return out
-    elif dx > dy:
-        y = 0
-        for x in range(0, dx):
-            if dy == 0: y = 0
-            elif x % dy == dy - 1: y += 1
-            mod = direction.necessary_movement(line_direction)
-            mod_x1, mod_x2 = x * mod[0], (x - 1) * mod[0]
-            mod_y = y * mod[1]
-            things  = board.get_anything(x_src + mod_x1, y_src + mod_y)
-            things += board.get_anything(x_src + mod_x2, y_src + mod_y)
-            for thing in things:
-                out.add(thing)
-                if type(thing) == Tile and thing.tile_type == 'wall': 
-                    return out
-    elif dy >= dx:
-        x = 0
-        for y in range(0, dy):
-            if dx == 0: x = 0
-            elif y % dx == dx - 1: x += 1
-            mod = direction.necessary_movement(line_direction)
-            mod_x = x * mod[0]
-            mod_y1, mod_y2 = y * mod[1], (y - 1) * mod[1]
-            things  = board.get_anything(x_src + mod_x, y_src + mod_y1)
-            things += board.get_anything(x_src + mod_x, y_src + mod_y2)
-            for thing in things:
-                out.add(thing)
-                if type(thing) == Tile and thing.tile_type == 'wall': 
-                    return out
-    return out
+    # recalculate diff and calculate error
+    dx = x2 - x1
+    dy = y2 - y1
+    error = dx // 2
+    ystep = 1 if y1 < y2 else -1
+
+    # iterate and add points in line
+    y = y1
+    points = []
+    for x in range(x1, x2 + 1):
+        coord = (y, x) if is_steep else (x, y)
+        points.append(coord)
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+
+    # reverse if swapped earlier
+    if swapped:
+        points.reverse()
+    return points
+

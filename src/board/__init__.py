@@ -5,7 +5,8 @@ import math
 
 import util.graphic as graphic
 from util.fov import fov_los
-from util.bsp import bsp
+import util.bsp as bsp
+from util.space import pixel_collide
 
 import board.tile as tile
 from board.room import Room
@@ -15,20 +16,26 @@ from entity.player import Player
 from entity.npc import NPC
 
 
+### CONSTANTS ###
 FOV_WIDTH = 6
 
 
 ### BOARD CLASS ###
 class Board(pg.Rect):
-    def __init__(self, controls, tile_width, dimensions, middle=(0,0), visibility=False):
+    def __init__(
+            self, controls, 
+            tile_width, dimensions, 
+            middle=(0,0), visibility=False):
         self.surface = pg.Surface(dimensions)
         self.visibility, self.middle = visibility, middle
         self.controls, self.tile_width = controls, tile_width
+        self.player = None
+
         self.rooms, self.tunnels = [], []
         self.tiles = pg.sprite.Group()
         self.entities = pg.sprite.Group()
         self.layers = [self.tiles, self.rooms, self.tunnels, self.entities]
-        self.player = None
+
         pg.Rect.__init__(self, (0,0), dimensions)
 
     def draw(self, surface):
@@ -39,32 +46,36 @@ class Board(pg.Rect):
 
     def update(self, check_input = False):
         self.player = None
+
         for entity in self.entities.sprites():
             if type(entity) == Player:
                 self.player = entity
-                if self.visibility: fov_los(self, entity, FOV_WIDTH * self.tile_width)
+                if self.visibility: 
+                    fov_los(self, entity, FOV_WIDTH * self.tile_width)
+
+        # adjust board to project around player
         if self.player != None and self.middle != (0,0):
             self.left = -self.player.rect.left + self.middle[0]
             self.top = -self.player.rect.top + self.middle[1]
+
         # keep background color consistent between entities and tiles
         for entity in self.entities.sprites():
             tile_bgc = self.get_tile(entity.tile_x, entity.tile_y).bgc
             entity.image.set_bgc(tile_bgc)
+
         # register inputs, tick on input
-        if not check_input: return
-        for entity in self.entities.sprites():
-            if type(entity) == Player:
-                if entity.process_input(self.controls, self): self._update()
+        if (not check_input) or (self.player == None): return
+        if self.player.process_input(self.controls, self): self._update()
 
     # private tick function
     def _update(self):
         for room in self.rooms: room.update()
+        self.entities.update()
+        self.tiles.update()
         for entity in self.entities.sprites():
             if type(entity) == NPC:
                 if self.player == None: continue
-                entity.follow_entity(self.player, self)
-        self.entities.update()
-        self.tiles.update()
+                #entity.follow_entity(self.player, self)
 
 
     ### GETTERS ###
@@ -82,17 +93,29 @@ class Board(pg.Rect):
                 return tile
         return None
 
+    def get_entity(self, tile_x, tile_y):
+        for entity in self.entities.sprites():
+            if entity.tile_x == tile_x and entity.tile_y == tile_y:
+                return entity
+        return None
+
+    def get_tile_at_pixel(self, pixel_x, pixel_y):
+        for tile in self.tiles.sprites():
+            if tile.pixel_collide(pixel_x, pixel_y): return tile
+        return None
+
+    def get_entity_at_pixel(self, pixel_coord):
+        for entity in self.entities.sprites():
+            if entity.pixel_collide(pixel_coord[0], pixel_coord[1]): 
+                return entity
+        return None
+
     def get_anything(self, tile_x, tile_y):
         things = []
         for thing in self.get_everything():
             if thing.tile_x == tile_x and thing.tile_y == tile_y:
                 things.append(thing)
         return things
-
-    def get_tile_at_pixel(self, pixel_x, pixel_y):
-        for tile in self.tiles.sprites():
-            if tile.pixel_collide(pixel_x, pixel_y): return tile
-        return None
 
     def get_everything(self):
         everything = []
@@ -109,15 +132,11 @@ class Board(pg.Rect):
     def get_everything_within_range(self, center_tile_coord, tile_distance):
         things_in_range = []
         for thing in self.get_everything():
-            dist = self.pixel_distance_between_tiles((thing.tile_x, thing.tile_y), center_tile_coord)
+            dist = self.pixel_distance_between_tiles(
+                    (thing.tile_x, thing.tile_y), center_tile_coord)
             if dist/self.tile_width < tile_distance:
                 things_in_range.append(thing)
         return things_in_range
-
-    def entity_at_pixel(self, pixel_coord):
-        for entity in self.entities.sprites():
-            if entity.pixel_collide(pixel_coord[0], pixel_coord[1]): return entity
-        return None
 
     def pixel_distance_between_tiles(self, tile_coord1, tile_coord2):
         x1, y1 = tile_coord1[0], tile_coord1[1]
@@ -129,8 +148,20 @@ class Board(pg.Rect):
         return math.sqrt(dx * dx + dy * dy)
 
     def get_random_floor(self):
-        chosen_room = self.rooms[random.randint(0, len(self.rooms)-1)]
-        return chosen_room.get_random_floor()
+        while True:
+            chosen_room = self.rooms[random.randint(0, len(self.rooms)-1)]
+            chosen_floor = chosen_room.get_random_floor()
+            coord = (chosen_floor.tile_x, chosen_floor.tile_y)
+            if self.get_entity(coord[0], coord[1]) == None: 
+                break
+        return chosen_floor
+
+    def are_connected(self, room1, room2):
+        for tunnel in self.tunnels:
+            if room1 in tunnel.rooms and room2 in tunnel.rooms:
+                return True
+        return False
+
 
 
     ### MUTATORS ###
@@ -142,13 +173,59 @@ class Board(pg.Rect):
         self.rooms.append(new_room)
         return new_room
 
-    def generate_floor(self, complexity):
-        for partition in bsp(self, complexity):
-            floor, wall = tile.cobble_floor, tile.cobble_wall
-            partition.build_room(floor, wall, 16, 3, 10)
+    # connect two rooms with a tunnel
+    def connect_rooms(self, room1, room2, max_dist = None):
+        room2_left, room2_top = room2.tile_coord[0], room2.tile_coord[1]
+        room2_right = room2.tile_coord[0] + room2.tile_dimension[0]
+        room2_bottom = room2.tile_coord[1] + room2.tile_dimension[1]
 
-    def connect_rooms(self, room1, room2):
-        if room1.distance_to_other_room(room2) == None: return None
-        new_tunnel = Tunnel(room1, room2, room1.floor, room1.wall)
-        if new_tunnel == None: return None
-        self.tunnels.append(new_tunnel)
+        new_tunnel = Tunnel(
+            room1, room2, 
+            room1.floor, room1.wall, 
+            fix_rooms = False
+        )
+        if new_tunnel == (0, 0, 0, 0): return False
+        if max_dist != None and new_tunnel.distance > max_dist: return False
+
+        for room in self.rooms:
+            if (room != room1 and room != room2) and room.overlap(new_tunnel):
+                print("Overlapping..")
+                return False
+
+        if new_tunnel == None: return False
+        else: 
+            new_tunnel = Tunnel(
+                room1, room2, 
+                room1.floor, room1.wall, 
+                fix_rooms=True
+            )
+            self.tunnels.append(new_tunnel)
+            return True
+
+
+    # generate a full dungeon floor
+    def generate_floor(self, complexity):
+        # run bsp and build rooms in the partitions,
+        # connections keeps track of groups of connected rooms
+        groups = []
+        for partition in bsp.bsp(self, complexity):
+            floor, wall = tile.cobble_floor, tile.cobble_wall
+            room = partition.build_room(floor, wall, 16, 5, 10)
+            groups.append([room])
+
+        for group1 in groups:
+            for group2 in groups:
+                if group1 in groups and len(group1) == 0: 
+                    groups.remove(group1)
+                if group2 in groups and len(group2) == 0: 
+                    groups.remove(group2)
+                if group1 == group2: continue
+                for room1 in group1:
+                    for room2 in group2:
+                        if self.are_connected(room1, room2): continue
+                        if self.connect_rooms(room1, room2):
+                            group1.append(room2)
+                            group2.remove(room2)
+        for group in groups:
+            if len(group) == 0: groups.remove(group)
+        print(len(groups))
