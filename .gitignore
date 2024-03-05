@@ -1,10 +1,17 @@
 /notes
+
 *.swp
+.swp
 **/*.swp
+**/.swp
+
 *.swo
+.swo
 **/*.swo
-*.DS_Store
-**/*.DS_Store
+**/.swo
+
+.DS_Store
+**/.DS_Store
 
 makefile
 main.spec
