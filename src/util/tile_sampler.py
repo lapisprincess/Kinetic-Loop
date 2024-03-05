@@ -1,4 +1,7 @@
 import pygame as pg
+import graphic as graphic
+
+tile_width = 16
 
 '''
 This is a quick little program I whipped up which samples the tilesheet.
@@ -31,13 +34,13 @@ def tile_sampler(start_coord):
         pg.display.flip()
         clock.tick(60)
 
-        curr_tile = Graphic((x,y), bgc=pg.color.Color(0,0,0))
+        curr_tile = graphic.Graphic((x,y), bgc=pg.color.Color(0,0,0))
         screen.blit(curr_tile, (0,0))
     
     pg.quit()
     exit(0)
 
-tile_samper((0, 0))
+tile_sampler((0, 0))
 if len(sys.argv) >= 3: start_coord = (int(sys.argv[2]), int(sys.argv[3])) 
 else: start_coord = (0, 0)
 tile_sampler(start_coord)

@@ -1,30 +1,32 @@
 import pygame as pg
 
 import util.direction as direction
-from board.tile import Tile
 
 
 # board gets mutated to fit los; seer stays constant
-def fov_los(board, seer, pixel_max_dist):
-    # start by making everything invisible
-    for tile in board.get_everything(): tile.visible = False
+def fov_los(board, seer, pixel_max_dist, shadow_log=False):
+    out = []
 
     # draw a line from seer to every tile within sight
     seer_coord = (seer.tile_x, seer.tile_y) 
     for tile in board.get_everything_within_range(seer_coord, 0.5):
         tile_coord = (tile.tile_x, tile.tile_y)
         visible_tiles = bresenham_line(seer_coord, tile_coord)
+
         for tile in visible_tiles:
             tile_obj = board.get_tile(tile[0], tile[1])
             if tile_obj != None: 
-                tile_obj.visible = True
-                if tile_obj.tile_type == 'wall': break
+                out.append(tile_obj)
+                if tile_obj.seethrough == False: break
             ent_obj = board.get_entity(tile[0], tile[1])
-            if ent_obj != None: ent_obj.visible = True
+            if ent_obj != None: 
+                out.append(ent_obj)
+                if ent_obj.seethrough == False: break
 
     # make sure seer stays visible
     seer.visible = True
     
+    return out
 
 # shamelessly stolen from rogue basin
 # https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python

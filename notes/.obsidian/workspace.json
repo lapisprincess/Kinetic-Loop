@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "ad11b2c5bf404199",
+        "id": "e0bbf19d89e22c43",
         "type": "tabs",
         "children": [
           {
-            "id": "8b9235c710421b9f",
+            "id": "17650eff1c1504aa",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -138,12 +138,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "8b9235c710421b9f",
+  "active": "17650eff1c1504aa",
   "lastOpenFiles": [
+    "Week 6.md",
     "Week 3.md",
+    "Week 1.md",
     "Week 2.md",
     "Init.md",
-    "Week 1.md",
     "Items.md",
     "Overview.md",
     "Scribbles.md",

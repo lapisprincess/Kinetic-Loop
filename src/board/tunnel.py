@@ -56,6 +56,7 @@ class Tunnel(Room):
         chosen_overlap = overlaps[random.randint(0, len(overlaps)-1)]
 
         match direction:
+
             case "north": 
                 self.distance = room1_top - room2_bottom + 2
                 coord = (chosen_overlap - 1, room2_bottom - 1)
@@ -66,6 +67,7 @@ class Tunnel(Room):
                 if fix_rooms:
                     room1.change_to_floor(chosen_overlap, room1_top)
                     room2.change_to_floor(chosen_overlap, room2_bottom - 1)
+
             case "south": 
                 self.distance = room2_top - room1_bottom + 2
                 coord = (chosen_overlap - 1, room1_bottom - 1)
@@ -76,6 +78,7 @@ class Tunnel(Room):
                 if fix_rooms:
                     room1.change_to_floor(chosen_overlap, room1_bottom - 1)
                     room2.change_to_floor(chosen_overlap, room2_top)
+
             case "east" : 
                 self.distance = room2_left - room1_right + 2
                 coord = (room1_right - 1, chosen_overlap - 1)
@@ -86,6 +89,7 @@ class Tunnel(Room):
                 if fix_rooms:
                     room1.change_to_floor(room1_right - 1, chosen_overlap)
                     room2.change_to_floor(room2_left, chosen_overlap)
+
             case "west" : 
                 self.distance = room1_left - room2_right + 2
                 coord = (room2_right - 1, chosen_overlap - 1)
@@ -94,5 +98,5 @@ class Tunnel(Room):
                 self.change_to_floor(room2_right - 1, chosen_overlap)
                 self.change_to_floor(room1_left, chosen_overlap)
                 if fix_rooms:
-                    room1.change_to_floor(room2_right - 1, chosen_overlap)
-                    room2.change_to_floor(room1_left, chosen_overlap)
+                    room1.change_to_floor(room1_left, chosen_overlap)
+                    room2.change_to_floor(room2_right - 1, chosen_overlap)

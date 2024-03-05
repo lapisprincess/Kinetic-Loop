@@ -58,7 +58,10 @@ class Room(pg.Rect):
 
     def change_to_floor(self, tile_x, tile_y):
         tile = self.get_tile(tile_x, tile_y)
-        if tile == None or tile.tile_type == "floor": return None
+        if tile == None: print("Actually, it's out of range!")
+        if tile == None or tile.tile_type == "floor": 
+            print("Already floor!")
+            return None
         self.tiles.remove(tile)
         new_tile = self.floor.clone(tile_x, tile_y)
         self.tiles.add(new_tile)
@@ -146,5 +149,33 @@ class Room(pg.Rect):
                 out.append(left_tile)
             if right_tile != None and right_tile.tile_type == 'wall': 
                 out.append(right_tile)
-
         return out
+
+
+    # connect two rooms with a tunnel
+    def connect_rooms(self, room2, max_dist = None):
+        room2_left, room2_top = room2.tile_coord[0], room2.tile_coord[1]
+        room2_right = room2.tile_coord[0] + room2.tile_dimension[0]
+        room2_bottom = room2.tile_coord[1] + room2.tile_dimension[1]
+
+        new_tunnel = Tunnel(
+            self, room2, 
+            self.floor, self.wall, 
+            fix_rooms = False
+        )
+        if new_tunnel == (0, 0, 0, 0): return False
+        if max_dist != None and new_tunnel.distance > max_dist: return False
+
+        for room in self.rooms:
+            if (room != self and room != room2) and room.overlap(new_tunnel):
+                return False
+
+        if new_tunnel == None: return False
+        else: 
+            new_tunnel = Tunnel(
+                self, room2, 
+                self.floor, self.wall, 
+                fix_rooms=True
+            )
+            self.tunnels.append(new_tunnel)
+            return True

@@ -3,10 +3,7 @@ import pygame as pg
 import random
 import math
 
-from board.tunnel import Tunnel
 from board.room import Room
-from board.tile import cobble_floor
-from board.tile import cobble_wall
 
 
 ### CONSTANTS ###

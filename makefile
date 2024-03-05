@@ -1,12 +1,22 @@
 run:
 	python3 src/main.py
 
+clean:
+	rm -rf **/__pycache__
+
+nofov:
+	python3 src/main.py nofov
+
+testroom:
+	python3 src/main.py testroom
+
+nofov-testroom:
+	python3 src/main.py nofov testroom
+
+
 tile-sampler:
-	python3 src/util/graphic.py tile_sampler 0 0
+	python3 src/util/tile_sampler.py
+
 
 setup: requirements.txt
 	pip install pygame
-
-clean:
-	rm -rf src/__pycache__
-
