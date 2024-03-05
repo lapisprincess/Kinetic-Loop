@@ -3,8 +3,8 @@
 **/*.swp
 *.swo
 **/*.swo
-*.DS_STORE
-**/*.DS_STORE
+*.DS_Store
+**/*.DS_Store
 
 makefile
 main.spec
