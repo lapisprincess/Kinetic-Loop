@@ -82,27 +82,34 @@ class Game:
         pg.mouse.set_cursor(self.cursor)
 
         # general game variables
-        self.mode = "game"
+        self.mode = "menu"
 
 
     def loop(self):
         running = True
         while running:
+            pg.display.flip()
+            self.clock.tick(30)
+
             match self.mode:
                 case "game": running = self.run_game()
                 case "menu": running = self.run_menu()
 
 
     def run_menu(self):
-        pass
+        tree_image = pg.image.load("data/tree.jpg")
+        self.screen.blit(tree_image, (0,-80))
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return False
+
+        return True
 
 
     def run_game(self):
         if pg.key.get_pressed()[pg.K_ESCAPE] and self.game_gui.popout is not None:
             self.game_gui.popout = None
-
-        pg.display.flip()
-        self.clock.tick(30)
 
         self.game_gui.change_level(self.player.level)
 
