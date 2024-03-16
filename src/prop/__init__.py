@@ -1,7 +1,11 @@
 import pygame as pg
 
-from board.tile import Tile
+from gameobj import GameObj
 
-class Prop(Tile):
+class Prop(GameObj):
     def __init__(self, tile_coord, sheet_coord, bgc, fgc):
-        Tile.__init__(self, tile_coord, sheet_coord, 'interactive', bgc, fgc)
+        GameObj.__init__(self, sheet_coord, tile_coord, (bgc, fgc))
+
+
+    def use(self):
+        pass

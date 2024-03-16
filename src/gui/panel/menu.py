@@ -6,8 +6,8 @@ import gui.button as button
 
 from util.tuples import *
 
-class Menu(Panel):
-    def __init__(self, pixel_coord, pixel_dimen, board, gui):
+class MenuPanel(Panel):
+    def __init__(self, pixel_coord, pixel_dimen, level, gui):
         Panel.__init__(self, pixel_coord, pixel_dimen)
 
         # ROOM FOR EIGHT BUTTONS!!
@@ -19,7 +19,7 @@ class Menu(Panel):
         look_color = (255, 100, 100)
         self.look_button = button.Button(
             look_coord, button_dimen, look_color,
-            button.toggle_looking, board
+            button.toggle_looking, level
         )
         self.buttons.append(self.look_button)
 

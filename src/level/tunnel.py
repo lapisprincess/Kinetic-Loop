@@ -2,7 +2,7 @@
 import pygame as pg
 import random
 
-from board.room import Room
+from level.room import Room
 
 
 ### TUNNEL CLASS ###

@@ -11,6 +11,11 @@ class Room(pg.Rect):
         self.floor, self.wall = floor, wall
         tile_x, tile_y = tile_coord[0], tile_coord[1]
         tile_width, tile_height = tile_dimension[0]-1, tile_dimension[1]-1
+
+        center_tilex = round(tile_x + tile_width / 2)
+        center_tiley = round(tile_y + tile_height / 2)
+        self.center_tile_coord = (center_tilex, center_tiley)
+
         # walls
         for i in range(tile_x, tile_x + tile_width):
             self.tiles.add(wall.clone(i, tile_y))
@@ -20,6 +25,7 @@ class Room(pg.Rect):
             self.tiles.add(wall.clone(tile_x, i))
         for i in range(tile_y, tile_y + tile_height + 1):
             self.tiles.add(wall.clone(tile_x + tile_width, i))
+
         # floor
         for y in range(tile_y + 1, tile_y + tile_height):
             for x in range(tile_x + 1, tile_x + tile_width):
@@ -27,7 +33,8 @@ class Room(pg.Rect):
         pg.Rect.__init__(self, tile_x, tile_y, tile_width, tile_height)
 
     def update(self):
-        for tile in self.tiles: tile.update()
+        for tile in self.tiles:
+            tile.update()
 
     def get_random_floor(self):
         floors = []
@@ -41,19 +48,19 @@ class Room(pg.Rect):
                 return tile
         return None
 
-    def get_perimeter(self, board):
+    def get_perimeter(self, level):
         out = []
         tile_x, tile_y = self.tile_coord[0], self.tile_coord[1]
         tile_width  = self.tile_dimension[0] - 1
         tile_height = self.tile_dimension[1] - 1
         for i in range(tile_x, tile_x + tile_width):
-            out.append(board.get_tile(i, tile_y))
+            out.append(level.get_tile(i, tile_y))
         for i in range(tile_x, tile_x + tile_width):
-            out.append(board.get_tile(i, tile_y + tile_height))
+            out.append(level.get_tile(i, tile_y + tile_height))
         for i in range(tile_y, tile_y + tile_height):
-            out.append(board.get_tile(tile_x, i))
+            out.append(level.get_tile(tile_x, i))
         for i in range(tile_y, tile_y + tile_height + 1):
-            out.append(board.get_tile(tile_x + tile_width, i))
+            out.append(level.get_tile(tile_x + tile_width, i))
         return out
 
     def change_to_floor(self, tile_x, tile_y):

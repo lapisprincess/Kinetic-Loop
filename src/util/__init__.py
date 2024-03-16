@@ -30,10 +30,3 @@ def define(data_path, file_path: str, lists = False):
 controls_path = "controls.txt"
 def define_controls(data_path):
     return define(data_path, controls_path, True)
-
-
-### SETTINGS ###
-settings_path = "settings.txt"
-needed_settings = ['screen_width', 'screen_height']
-def define_settings(data_path):
-    return define(data_path, settings_path)

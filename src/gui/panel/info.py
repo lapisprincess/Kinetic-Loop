@@ -9,7 +9,7 @@ COLOR = (255, 255, 255)
 
 
 ### INFO PANEL CLASS ###
-class Info(Panel):
+class InfoPanel(Panel):
     def __init__(self, pixel_coord, pixel_dimension):
         Panel.__init__(self, pixel_coord, pixel_dimension)
 

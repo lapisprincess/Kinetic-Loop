@@ -7,7 +7,7 @@ from gui.panel import Panel
 ### LOG CLASS ###
 # log is where messages get logged,
 # also used for text input and debugging
-class Log(Panel):
+class LogPanel(Panel):
 
     def __init__(self, pixel_coord, pixel_dimension, fonts):
         Panel.__init__(self, pixel_coord, pixel_dimension, fonts)
@@ -81,7 +81,7 @@ class Log(Panel):
     def type(self, event):
 
         # leave type mode
-        exit_keys = [pg.K_BACKSPACE, pg.K_ESCAPE, pg.K_RETURN]
+        exit_keys = [pg.K_ESCAPE, pg.K_RETURN]
         if event.key in exit_keys:
             self.typing = False
 

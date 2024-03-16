@@ -1,7 +1,7 @@
+""" """
+
 ### IMPORTS ###
 import pygame as pg
-
-from util.graphic import Graphic
 
 from entity import Entity
 
@@ -14,10 +14,10 @@ CURSOR_BGC = pg.Color(100, 0, 0)
 
 ### CURSOR CLASS ###
 class Cursor(Entity):
-    def __init__(self, tile_size, board):
+    """ """
+    def __init__(self, level):
         Entity.__init__(
-            self, (0, 0), 
-            CURSOR_GRAPHIC, CURSOR_BGC, CURSOR_FGC,
-            board
+            self, CURSOR_GRAPHIC,
+            colors=(CURSOR_BGC, CURSOR_FGC), level=level
         )
         self.info["HP"] = 1 # cursor, plz don't die

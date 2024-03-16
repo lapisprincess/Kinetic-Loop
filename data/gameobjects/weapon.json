@@ -1,0 +1,23 @@
+{ "weapons":
+
+    { "name": "Dirk",
+        "level": 1,
+        "damage": 15,
+        "type": "melee"
+    },
+
+    { "name": "Adventurer's Scabbard",
+        "level": 2,
+        "damage": 20,
+        "type": "melee"
+    },
+
+    { "name": "Oak Bow",
+        "damage": 10,
+        "type": "ranged"
+    },
+
+    {
+
+    }
+}

@@ -1,3 +1,5 @@
+""" panels help structure gui """
+
 ### IMPORTS ###
 import pygame as pg
 
@@ -5,6 +7,7 @@ import pygame as pg
 ### CONSTANTS ###
 MID_PRCNT = (0.75, 0.72)
 BORDER = pg.image.load("data/leafy_border.png")
+BORDER_ALT = pg.image.load("data/leafy_border_alt.png")
 
 
 ### PANEL CLASS ###
@@ -16,19 +19,22 @@ class Panel(pg.Surface):
         self.fonts=fonts
 
 
-    # add a border around the panel
-    def set_border(self, mid_color=None):
+    def set_border(self, mid_color=None, alt=False):
+        """ add a border around the panel """
         self.mid = pg.Rect(
-            self.rect.left, self.rect.top, 
-            self.rect.width * MID_PRCNT[0], 
+            self.rect.left, self.rect.top,
+            self.rect.width * MID_PRCNT[0],
             self.rect.height * MID_PRCNT[1]
         )
         self.mid.center = self.rect.center
 
         new_scale = (self.rect.width, self.rect.height)
-        scaled_border = pg.transform.scale(BORDER, new_scale)
+        if alt:
+            scaled_border = pg.transform.scale(BORDER_ALT, new_scale)
+        else:
+            scaled_border = pg.transform.scale(BORDER, new_scale)
 
-        if mid_color != None:
+        if mid_color is not None:
             adjusted_rect = (0, 0, self.rect.width, self.rect.height)
             pg.draw.rect(self, mid_color, adjusted_rect)
 
@@ -36,6 +42,9 @@ class Panel(pg.Surface):
 
 
     def draw(self, surface):
+        """ panel drawer """
         surface.blit(self, (self.rect.left, self.rect.top))
 
-    def update(self): None
+    def update(self):
+        """ placeholder update method in case of idle panel """
+        pass

@@ -1,100 +1,120 @@
-### IMPORTS ###
+"""Universal entity module"""
+
+## IMPORTS
 import pygame as pg
 
-import util.graphic as graphic
+from util import graphic
 import util.direction as directionality
 from util.fov import fov_los
 
-### CONSTANTS ###
+from prop.stairs import Stairs
+
+from gameobj import GameObj
+
+
+## CONSTANTS
 UNARMED_DMG = 5
 FOV_WIDTH = 6
 
 
+## ENTITY CLASS
+class Entity(GameObj):
+    """Informal entity class to be inherited
 
-### ENTITY CLASS ###
-class Entity(pg.sprite.Sprite):
-    def __init__(self, tile_coord, sheet_coord, bgc, fgc, board):
-        self.tile_x, self.tile_y = tile_coord[0], tile_coord[1]
+    """
 
+    def __init__(
+        self, sheet_coord, tile_coord=None,
+        colors=None, level=None
+    ):
+
+        GameObj.__init__(self, sheet_coord, tile_coord, colors, level)
+
+        self.info["HP"] = 0
+        self.info["Name"] = "Sprout"
+
+        self.target = None
         self.inventory = []
         self.equipped = {
             "helmet" : None,
             "Armor" : None,
             "Weapon" : None,
         }
-        self.target = None
-
-        self.image = graphic.Graphic(sheet_coord, bgc, fgc)
-        self.rect = self.image.get_rect()
-        self.board = board
 
         self.visible = True
         self.seethrough = True
         self.traversable = False
-        self.fov = fov_los(self.board, self, FOV_WIDTH * self.board.tile_width)
 
-        self.info = {"HP": 0, "Name": "Sprout"}
+        if self.level is not None and tile_coord is not None:
+            self.fov = fov_los(self.level, self)
+        else: self.fov = None
+
         self.traits = set()
 
-        pg.sprite.Sprite.__init__(self)
-        
-        #self.update()
 
+    def update(self):
+        """ TODO """
+        GameObj.update(self)
 
-    # every entity should adjust their rectangles accordingly
-    def update(self): 
-        self.rect.x = self.tile_x * graphic.tile_width
-        self.rect.y = self.tile_y * graphic.tile_width
+        self.fov = fov_los(self.level, self)
 
-        self.fov = fov_los(self.board, self, FOV_WIDTH * self.board.tile_width)
-
-        if self.info["HP"] <= 0: 
-            self.board.log_message(self.get_info()["Name"] + " dies!!")
+        if self.info["HP"] <= 0:
+            self.level.log_message(self.get_info()["Name"] + " died!!")
             self.kill()
 
     def take_turn(self):
+        """ TODO """
         for trait in self.traits:
-            if trait.priority != 1: continue
-            if trait.act(self) == True: 
+            if trait.priority != 1:
+                continue
+            if trait.act(self) is True:
                 return True
         for trait in self.traits:
-            if trait.priority != 2: continue
-            if trait.act(self) == True: 
+            if trait.priority != 2:
+                continue
+            if trait.act(self) is True:
                 return True
         for trait in self.traits:
-            if trait.priority != 3: continue
-            if trait.act(self) == True: 
+            if trait.priority != 3:
+                continue
+            if trait.act(self) is True:
                 return True
         return False
 
 
     # universal move method, usable by any entity to move one tile at a time
     # returns True if any action taken
-    def move(self, direction, full=False):
+    def move(self, direction, full_movement=False):
+        """ TODO """
 
         # get new coordinates
         mods = directionality.necessary_movement(direction)
-        if mods == None: return False
+        if mods is None:
+            return False
         x, y = mods[0], mods[1]
-        x_coord, y_coord = self.tile_x + x, self.tile_y + y
+        x_coord = self.tile_x + x
+        y_coord = self.tile_y + y
 
         # check if entity at new coords, auto-interact if so
-        entity = self.board.get_entity(x_coord, y_coord)
-        if entity != None and full == False:
+        entity = self.level.get(x_coord, y_coord, Entity)
+        if entity is not None and full_movement is False:
             self.attack(entity)
             return False
 
         # see if anything is in the way
-        things = self.board.get_anything(x_coord, y_coord)
-        if things == None: return False
-        for thing in things:
-            if thing.traversable == False and not full: return False
-        self.tile_x, self.tile_y = x_coord, y_coord
+        thing = self.level.get(x_coord, y_coord)
+        if not full_movement and (thing is None or thing.traversable is False):
+            return False
+
+        # success!
+        self.tile_x = x_coord
+        self.tile_y = y_coord
         return True
 
 
     # default info provider, filling in missing key info
     def get_info(self):
+        """ TODO """
         if "Name" not in self.info:
             self.info["Name"] = "Leafling"
         if "Image" not in self.info:
@@ -104,15 +124,21 @@ class Entity(pg.sprite.Sprite):
 
 
     def damage(self, dmg):
+        """ TODO """
         self.info["HP"] -= dmg
 
     def attack(self, target):
-        if self.equipped["Weapon"] != None:
-            None
-        else:
-            message = self.get_info()["Name"] 
-            message += " attacked " + target.get_info()["Name"]
-            message += " for " + str(UNARMED_DMG) + " damage!"
-            self.board.log_message(message)
-            target.damage(UNARMED_DMG)
-            target.update()
+        """ TODO """
+        dmg = UNARMED_DMG
+        if self.equipped["Weapon"] is not None:
+            dmg = self.equipped["Weapon"].damage
+        message = self.get_info()["Name"]
+        message += " attacked " + target.get_info()["Name"]
+        message += " for " + str(dmg) + " damage!"
+        self.level.log_message(message)
+        target.damage(dmg)
+        target.update()
+
+    def add_item(self, new_item):
+        """ Give the entity a new item """
+        self.inventory.append(new_item)

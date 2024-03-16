@@ -15,9 +15,15 @@ fast-south = K_LSHIFT & K_j
 fast-east  = K_LSHIFT & K_l
 fast-west  = K_LSHIFT & K_h
 
+up   = K_LSHIFT & K_COMMA
+down = K_LSHIFT & K_PERIOD
+
 look = K_x
 unlook = K_ESCAPE
 wait = K_PERIOD
+
+
+
 
 ### LEGACY CONTROLS ###
 # north  = K_UP

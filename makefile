@@ -2,7 +2,7 @@ run:
 	python3 src/main.py
 
 clean:
-	rm -rf **/__pycache__
+	rm test.sh
 
 nofov:
 	python3 src/main.py nofov

@@ -3,7 +3,7 @@ import pygame as pg
 import random
 import math
 
-from board.room import Room
+from level.room import Room
 
 
 ### CONSTANTS ###
@@ -63,18 +63,18 @@ class Partition(pg.Rect):
 
         left = part_left_tiles + random.randint(0, part_width_tiles - width)
         top = part_top_tiles + random.randint(0, part_height_tiles - height)
-        return self.board.build_room((left, top), (width, height), floor, wall)
+        return self.level.build_room((left, top), (width, height), floor, wall)
 
 
 # split every partition a certain number of times
-def bsp(board: pg.Rect, complexity: int) -> list[Partition]:
-    out = [Partition(board)]
+def bsp(level, complexity: int) -> list[Partition]:
+    out = [Partition(level)]
     for lvl in range(0, complexity):
         for partition in out:
-            new_partitions = partition.split(board.tile_width)
+            new_partitions = partition.split(level.tile_width)
             if new_partitions != None: 
                 out.remove(partition)
                 for new_partition in new_partitions: 
                     out.append(new_partition)
-    for partition in out: partition.board = board
+    for partition in out: partition.level = level
     return out

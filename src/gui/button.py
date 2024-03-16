@@ -3,7 +3,7 @@ import pygame as pg
 
 from gui.panel import Panel
 from gui.popout import Popout
-from board import Board
+from level import Level
 
 ### BUTTON CLASS ###
 class Button(Panel):
@@ -25,9 +25,9 @@ class Button(Panel):
 
 
 ### SMALL BUTTON FUNCTIONS ###
-def toggle_looking(board):
-    if type(board) == Board: 
-        board.toggle_looking()
+def toggle_looking(level):
+    if type(level) == level: 
+        level.toggle_looking()
 
 def test_panel(gui):
     popout_size = (gui.screen_size[0] - 60, gui.screen_size[1] - 60)

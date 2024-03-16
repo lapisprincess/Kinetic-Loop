@@ -1,36 +1,43 @@
-import pygame as pg
+""" methods needed to generate FOV """
 
-import util.direction as direction
-
-
-# board gets mutated to fit los; seer stays constant
-def fov_los(board, seer, pixel_max_dist, shadow_log=False):
+# level gets mutated to fit los; seer stays constant
+def fov_los(level, seer):
+    """ get the field of view surrounding a given "seer."
+    los is cut off if non-transparent obstacles in the way.
+    """
     out = []
 
     # draw a line from seer to every tile within sight
-    seer_coord = (seer.tile_x, seer.tile_y) 
-    for tile in board.get_everything_within_range(seer_coord, 0.5):
+    seer_coord = (seer.tile_x, seer.tile_y)
+    for tile in level.get_everything_within_range(seer_coord, 5):
         tile_coord = (tile.tile_x, tile.tile_y)
         visible_tiles = bresenham_line(seer_coord, tile_coord)
+        for tile_coord in visible_tiles:
 
-        for tile in visible_tiles:
-            tile_obj = board.get_tile(tile[0], tile[1])
-            if tile_obj != None: 
-                out.append(tile_obj)
-                if tile_obj.seethrough == False: break
-            ent_obj = board.get_entity(tile[0], tile[1])
-            if ent_obj != None: 
-                out.append(ent_obj)
-                if ent_obj.seethrough == False: break
+            # test for game object
+            gameobj = level.get_game_object(tile_coord[0], tile_coord[1])
+            if gameobj is not None:
+                out.append(gameobj)
+                if gameobj.seethrough is False:
+                    break
 
-    # make sure seer stays visible
-    seer.visible = True
-    
+            # test for tile
+            tile = level.get_tile(tile_coord[0], tile_coord[1])
+            if tile is not None:
+                out.append(tile)
+                if tile.seethrough is False:
+                    break
+
     return out
 
-# shamelessly stolen from rogue basin
-# https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python
+
 def bresenham_line(start, end):
+    """ algorithm to calculate lines
+
+    shamelessly stolen from rogue basin
+    https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python
+    """
+
     x1, y1 = start
     x2, y2 = end
     dx = x2 - x1
@@ -70,4 +77,3 @@ def bresenham_line(start, end):
     if swapped:
         points.reverse()
     return points
-

@@ -30,18 +30,20 @@ class Node:
 
 
 
-### PATHFINDING METHOD ###
-def pathfind(source, dest, board):
+def pathfind(source, dest, level):
+    """ main pathfinding method, using A* algo """
     open_set = []
     open_set.append(Node(source[0], source[1], dest))
-    
-    while len(open_set) != 0:
+    frustration = 0
+
+    while len(open_set) > 0 and frustration < 1000:
         # find the tile with the lowest score
         current = None
         for node in open_set:
-            if (current == None) or (node.f < current.f):
+            if (current is None) or (node.f < current.f):
                 current = node
-        if current == None: break
+        if current is None:
+            break
 
         # if tile is dest, return reconstructed path!
         if (current.x, current.y) == dest:
@@ -49,7 +51,7 @@ def pathfind(source, dest, board):
 
         open_set.remove(current)
         for neighbor in current.neighbors:
-            neighbor_tile = board.get_tile(neighbor[0], neighbor[1])
+            neighbor_tile = level.get_tile(neighbor[0], neighbor[1])
             if not neighbor_tile.traversable:
                 continue
 
@@ -61,8 +63,10 @@ def pathfind(source, dest, board):
                         node = tentative_node
                     added = 1
 
-            if not added: 
+            if not added:
                 open_set.append(tentative_node)
+
+        frustration+=1
 
 
     # no path possible

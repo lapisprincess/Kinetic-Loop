@@ -36,16 +36,16 @@ def match_direction(coord1: tuple[int, int], coord2: tuple[int, int]) -> str:
     elif (vert == ''): return horz
     return (vert + '-' + horz)
 
-def get_random_neighbor(tile_coord, board, poss_directions = all_directions):
+def get_random_neighbor(tile_coord, level, poss_directions = all_directions):
     if poss_directions == []: return None
 
     tentative_dir = random.randint(0, len(poss_directions) - 1)
     mov = necessary_movement(tentative_dir)
-    tile = board.get_tile(tile_coord[0] + mov[0], tile_coord[1] + mov[1])
+    tile = level.get_tile(tile_coord[0] + mov[0], tile_coord[1] + mov[1])
     
     if tile == None:
         poss_directions.remove(tentative_dir)
-        return get_random_neighbor(tile_coord, board, poss_directions)
+        return get_random_neighbor(tile_coord, level, poss_directions)
 
     return tile
 

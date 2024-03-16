@@ -3,10 +3,10 @@ import pygame as pg
 
 from gui.panel import Panel
 
-class Board(Panel):
-    def __init__(self, pixel_coord, pixel_dimension, board):
+class LevelPanel(Panel):
+    def __init__(self, pixel_coord, pixel_dimension, level):
         Panel.__init__(self, pixel_coord, pixel_dimension)
-        self.rect = board
+        self.rect = level
 
         self.rect.middle = (
             pixel_coord[0] + (pixel_dimension[0] / 2),

@@ -1,3 +1,5 @@
+""" Non Player Characters """
+
 ### IMPORTS ###
 import pygame as pg
 
@@ -6,7 +8,4 @@ from util.pathfind import pathfind
 
 
 class NPC(Entity):
-    def follow_entity(self, target, board):
-        path = pathfind(board, self, target)
-        #print(path)
-        #self.move(path.pop()["direction"], board)
+    pass
