@@ -159,12 +159,8 @@ class Room(pg.Rect):
         return out
 
 
-    # connect two rooms with a tunnel
     def connect_rooms(self, room2, max_dist = None):
-        room2_left, room2_top = room2.tile_coord[0], room2.tile_coord[1]
-        room2_right = room2.tile_coord[0] + room2.tile_dimension[0]
-        room2_bottom = room2.tile_coord[1] + room2.tile_dimension[1]
-
+        """ connect two rooms with a tunnel """
         new_tunnel = Tunnel(
             self, room2, 
             self.floor, self.wall, 

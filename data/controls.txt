@@ -19,8 +19,10 @@ up   = K_LSHIFT & K_COMMA
 down = K_LSHIFT & K_PERIOD
 
 look = K_x
+select = K_RETURN
 unlook = K_ESCAPE
 wait = K_PERIOD
+fire = K_f
 
 
 

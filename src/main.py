@@ -6,7 +6,6 @@ import sys
 import pygame as pg
 
 from game import Game
-import util
 
 ## HANDLE COMMAND LINE INPUTS
 arguments = sys.argv
@@ -21,7 +20,6 @@ pg.display.set_caption("🍃Leaflings🍂")
 
 ## CREATE GAME OBJECT
 game = Game(setFOV, testroom)
-
 
 game.loop()
 

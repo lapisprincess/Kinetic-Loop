@@ -54,6 +54,8 @@ class Level(pg.Rect):
     ### DRAW METHODS ###
     def draw(self, surface):
         """ TODO """
+        print("level ", self.name)
+        print("shadows ", len(self.shadows))
         self.surface.fill("black")
 
         self._draw_shadows()
@@ -124,14 +126,22 @@ class Level(pg.Rect):
                 if cond1 or cond2:
                     self.toggle_looking()
 
+                # wait
                 if keys[eval("pg." + self.controls['wait'][0])]:
                     self._take_entity_turns()
 
+                # look
                 if self.looking:
                     self.cursor.take_turn()
                     self.cursor.update()
                 elif self.player.take_turn():
                     self._take_entity_turns()
+
+                if keys[eval("pg." + self.controls['fire'][0])]:
+                    if self.looking:
+                        cursor_pos = self.cursor.tile_x, self.cursor.tile_y
+                        self.player.attack_ranged(self.get(cursor_pos[0], cursor_pos[1]))
+                        self.toggle_looking()
 
             # adjust visibility around player
             if not self.visibility:
@@ -167,7 +177,12 @@ class Level(pg.Rect):
     # keep bgc consistent between level and entity
     def _adjust_entity_bgc(self):
         for gameobj in self.game_objects.sprites():
-            tile_bgc = self.get_tile(gameobj.tile_x, gameobj.tile_y).colors[0]
+            tile = self.get_tile(gameobj.tile_x, gameobj.tile_y)
+            if tile is None:
+                print("Something's in the void......")
+                print("Coords: ", gameobj.tile_x, gameobj.tile_y, "\n")
+                continue
+            tile_bgc = tile.colors[0]
             gameobj.image.set_bgc(tile_bgc)
 
     # get relevant info based on cursor/player position
@@ -285,6 +300,15 @@ class Level(pg.Rect):
             if tile_x in room_range_x and tile_y in room_range_y:
                 return room
         return None
+
+    def get_all_rooms(self):
+        """ get all rooms that are strictly rooms, not tunnels """
+        all_rooms = []
+        for room in self.rooms:
+            if not isinstance(room, Tunnel):
+                all_rooms.append(room)
+        return all_rooms
+
 
     def get_random_floor(self, frustration=0):
         """ get a random floor """

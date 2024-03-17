@@ -1,8 +1,12 @@
-{"entities": 
+{"entities": [
     {
-        "name": "adoring fan",
+        "name": "Adoring Fan",
+        "id": "adoring_fan",
+        "description": "This fanatic can't get enough of the player!",
         "hp": 5,
         "damage": 3,
-        "xp": 5
+        "level": 1,
+        "tile": [6, 6],
+        "traits": ["wander", "hostile"]
     }
-}
+]}

@@ -11,26 +11,37 @@ class GameObj(pg.sprite.Sprite):
     """
 
     def __init__(
-        self, sheet_coord, tile_coord=None,
-        colors=None, level=None
+        self, 
+        sheet_coord: tuple[int,int], 
+        tile_coord: tuple[int,int] =None,
+        colors: tuple[pg.Color,pg.Color] =None, 
+        level: int =None,
+        info: dict =None,
     ):
+        if tile_coord is None:
+            tile_coord = 0, 0
+        if colors is None:
+            colors = (pg.Color("black"), pg.Color("white"))
+        if level is None:
+            level = 0
+        if info is None:
+            info = {
+                "name": "Mystery object",
+                "hp": 0
+            }
+
         pg.sprite.Sprite.__init__(self)
 
-        if colors is None:
-            colors = (pg.Color(0, 0, 0), pg.Color(255, 255, 255))
+        self.tile_x, self.tile_y = tile_coord[0], tile_coord[1]
+        self.info = info
+        self.traits = set()
 
         self.image = graphic.Graphic(sheet_coord, bgc=colors[0], fgc=colors[1])
+        self.info["image"] = self.image
         self.rect = self.image.get_rect()
         self.level = level
 
-        if tile_coord is not None:
-            self.tile_x, self.tile_y = tile_coord[0], tile_coord[1]
-        else:
-            self.tile_x, self.tile_y = None, None
-        self.info = {}
-        self.traits = set()
-
-        self.visible = False
+        self.visible = True
         self.seethrough = False
         self.traversable = False
 

@@ -39,7 +39,7 @@ class InfoPanel(Panel):
         else: mod = 0
         
         # first image
-        image = info["Image"]
+        image = info["image"]
         coord = (
             self.mid.left + self.mid.width * 0.05,
             self.mid.top + mod + 15
@@ -47,7 +47,7 @@ class InfoPanel(Panel):
         surface.blit(image, coord)
 
         # second image
-        name = info["Name"]
+        name = info["name"]
         text = h1_font.render(name, False, COLOR)
         coord = (
             self.mid.left + self.mid.width * 0.2, 
@@ -57,9 +57,9 @@ class InfoPanel(Panel):
 
         # draw rest
         depth = 50
-        for key in info.keys():
-            if key == "Image": continue
-            elif key == "Name": continue
+        for key in info:
+            if key == "image": continue
+            elif key == "name": continue
             val = str(info[key])
             key += ':'
             key_render = li_font.render(key, False, COLOR)

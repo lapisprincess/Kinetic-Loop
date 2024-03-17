@@ -1,7 +1,10 @@
 """ Player class """
 
 ### IMPORTS ###
+import pygame as pg
+
 from util.pathfind import pathfind
+from util.fov import fov_los
 
 from prop.stairs import Stairs
 
@@ -11,13 +14,14 @@ from entity.npc import NPC
 
 ### PLAYER CLASS ###
 class Player(Entity):
-    """Player class, inheriting from Entity
+    """Player class, inheriting from Entity """
 
-
-    """
     def __init__(
-        self, sheet_coord, tile_coord=None,
-        colors=None, level=None
+        self, 
+        sheet_coord :tuple[int,int], 
+        tile_coord :tuple[int,int] =None,
+        colors :tuple[pg.Color,pg.Color] =None, 
+        level =None
     ):
         self.id = "player"
         Entity.__init__(
@@ -29,9 +33,9 @@ class Player(Entity):
         self.travel_path = None
         self.current_room = None
 
-        self.info["Name"] = "Tilda"
-        self.info["HP"] = 15
-        self.info["Roots"] = 0
+        self.info["name"] = "Tilda"
+        self.info["hp"] = 15
+        self.info["roots"] = 0
 
         self.visible = True
 
@@ -41,8 +45,12 @@ class Player(Entity):
         for tile in self.fov:
             if not isinstance(tile, NPC):
                 self.level.shadows.add(tile)
+        self.fov = fov_los(self.level, self) # player fov should always be up to date
 
     def move(self, direction, full_movement=False):
+        """ player movement should also account for stairs """
+        result = Entity.move(self, direction, full_movement)
+
         if direction in ("up", "down"):
             # check if player walking up/down stairs
             stairs = self.level.get(self.tile_x, self.tile_y, Stairs)
@@ -51,7 +59,6 @@ class Player(Entity):
                 return True
             return False
 
-        result = Entity.move(self, direction, full_movement)
         return result
 
     def fast_move(self):

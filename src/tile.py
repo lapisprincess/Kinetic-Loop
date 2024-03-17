@@ -43,8 +43,8 @@ class Tile(GameObj):
             self.seethrough = True
             self.traversable = True
 
-        self.info["Name"] = tile_id
-        self.info["Image"] = self.image
+        self.info["name"] = tile_id
+        self.info["image"] = self.image
 
         # preliminary update for accuracy
         self.update()
@@ -61,7 +61,7 @@ class Tile(GameObj):
         if tile_y is None:
             tile_y = self.tile_y
         return Tile(
-            tile_id = self.info["Name"],
+            tile_id = self.info["name"],
             tile_coord  = (tile_x, tile_y),
             sheet_coord = (self.sheet_x, self.sheet_y),
             tile_type   = self.tile_type,
@@ -77,10 +77,10 @@ class Tile(GameObj):
         return False
 
     def get_info(self):
-        if "Name" not in self.info:
-            self.info["Name"] = "Unknown Tile"
-        if "Image" not in self.info:
-            self.info["Image"] = self.image
+        if "name" not in self.info:
+            self.info["name"] = "Unknown Tile"
+        if "image" not in self.info:
+            self.info["image"] = self.image
 
         return self.info
 

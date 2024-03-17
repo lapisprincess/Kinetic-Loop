@@ -1,6 +1,7 @@
 """Universal entity module"""
 
 ## IMPORTS
+import json
 import pygame as pg
 
 from util import graphic
@@ -15,6 +16,7 @@ from gameobj import GameObj
 ## CONSTANTS
 UNARMED_DMG = 5
 FOV_WIDTH = 6
+DATA_FILE = open("data/gameobjects/entity.json")
 
 
 ## ENTITY CLASS
@@ -24,31 +26,46 @@ class Entity(GameObj):
     """
 
     def __init__(
-        self, sheet_coord, tile_coord=None,
-        colors=None, level=None
+        self, 
+        sheet_coord :tuple[int,int],
+        tile_coord :tuple[int,int] =None,
+        colors :tuple[pg.Color,pg.Color] =None, #(bgc, fgc)
+        level =None,
+        info :dict =None
     ):
+        
+        # initialize as game object
+        GameObj.__init__(self, sheet_coord, tile_coord, colors, level, info)
 
-        GameObj.__init__(self, sheet_coord, tile_coord, colors, level)
+        # store crucial information
+        if "hp" not in self.info:
+            self.info["hp"] = 0
+        if "name" not in self.info:
+            self.info["name"] = "Sprout"
 
-        self.info["HP"] = 0
-        self.info["Name"] = "Sprout"
-
+        # store params for cloning
+        self.sheet_coord, self.colors = sheet_coord, colors
+        
+        # extra info
         self.target = None
         self.inventory = []
         self.equipped = {
             "helmet" : None,
-            "Armor" : None,
-            "Weapon" : None,
+            "armor" : None,
+            "weapon" : None,
         }
 
+        # spacial info
         self.visible = True
         self.seethrough = True
         self.traversable = False
 
+        # initial fov intake
         if self.level is not None and tile_coord is not None:
             self.fov = fov_los(self.level, self)
         else: self.fov = None
 
+        # space for traits to be added (will likely become a parameter TODO)
         self.traits = set()
 
 
@@ -56,10 +73,8 @@ class Entity(GameObj):
         """ TODO """
         GameObj.update(self)
 
-        self.fov = fov_los(self.level, self)
-
-        if self.info["HP"] <= 0:
-            self.level.log_message(self.get_info()["Name"] + " died!!")
+        if self.info["hp"] <= 0:
+            self.level.log_message(self.get_info()["name"] + " died!!")
             self.kill()
 
     def take_turn(self):
@@ -82,10 +97,9 @@ class Entity(GameObj):
         return False
 
 
-    # universal move method, usable by any entity to move one tile at a time
-    # returns True if any action taken
     def move(self, direction, full_movement=False):
-        """ TODO """
+        """ move entity, respecting obstacles.
+        returns true if move successful, false otherwise """
 
         # get new coordinates
         mods = directionality.necessary_movement(direction)
@@ -109,36 +123,108 @@ class Entity(GameObj):
         # success!
         self.tile_x = x_coord
         self.tile_y = y_coord
+        self.fov = fov_los(self.level, self) # new fov
         return True
 
 
     # default info provider, filling in missing key info
     def get_info(self):
         """ TODO """
-        if "Name" not in self.info:
-            self.info["Name"] = "Leafling"
-        if "Image" not in self.info:
-            self.info["Image"] = self.image
+        if "name" not in self.info:
+            self.info["name"] = "leafling"
+        if "image" not in self.info:
+            self.info["image"] = self.image
 
         return self.info
 
 
-    def damage(self, dmg):
-        """ TODO """
-        self.info["HP"] -= dmg
-
     def attack(self, target):
+        self.attack_melee(target)
+
+    def attack_ranged(self, target):
         """ TODO """
-        dmg = UNARMED_DMG
-        if self.equipped["Weapon"] is not None:
-            dmg = self.equipped["Weapon"].damage
-        message = self.get_info()["Name"]
-        message += " attacked " + target.get_info()["Name"]
-        message += " for " + str(dmg) + " damage!"
+        if target not in self.fov:
+            self.level.log_message("Out of range!")
+            return
+        if not isinstance(target, Entity):
+            self.level.log_message("Can only fire at entities!")
+            return
+
+        weapon = self.equipped["weapon"]
+        if weapon is not None and weapon.type == "ranged":
+            dmg = weapon.dmg
+            weapon_name = weapon.name
+        else:
+            self.level.log_message("Cannot fire a melee weapon!")
+            return
+
+        message = self.get_info()["name"]
+        message += " fired at " + target.get_info()["name"]
+        message += " for " + str(dmg) + " damage "
+        message += " with their " + weapon_name + "!"
         self.level.log_message(message)
-        target.damage(dmg)
+
+        self.info["HP"] -= dmg
+        target.update()
+
+    def attack_melee(self, target):
+        """ TODO """
+        weapon = self.equipped["weapon"]
+        if weapon is not None and weapon.type == "melee":
+            dmg = weapon.dmg
+            weapon_name = weapon.name
+        else:
+            dmg = UNARMED_DMG
+            weapon_name = "fists"
+
+        message = self.get_info()["name"]
+        message += " attacked " + target.get_info()["name"]
+        message += " for " + str(dmg) + " damage "
+        message += " with their " + weapon_name + "!"
+        self.level.log_message(message)
+
+        self.info["hp"] -= dmg
         target.update()
 
     def add_item(self, new_item):
         """ Give the entity a new item """
         self.inventory.append(new_item)
+
+    def clone(self, tile_x:int =None, tile_y:int =None):
+        """ Method to create a duplicate of entity,
+        useful for creating duplicatable template entities! """
+        if tile_x is None:
+            tile_x = self.tile_x
+        if tile_y is None:
+            tile_y = self.tile_y
+
+        return Entity(
+            self.sheet_coord,
+            (tile_x, tile_y),
+            self.colors,
+            self.level,
+            self.info
+        )
+
+
+
+def parse_entity_data(all_levels):
+    entities = []
+
+    entities_data = json.load(DATA_FILE)["entities"]
+    for entity_data in entities_data:
+
+        entity_info = {}
+        entity_info["name"] = entity_data["name"]
+        entity_info["description"] = entity_data["description"]
+        entity_info["hp"] = entity_data["hp"]
+
+        entity_sheet_coord = entity_data["tile"][0], entity_data["tile"][1]
+        entities.append(Entity(
+            sheet_coord =entity_sheet_coord,
+            tile_coord =None,
+            level =all_levels[entity_data["level"]],
+            info = entity_info
+        ))
+
+    return entities

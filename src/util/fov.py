@@ -31,12 +31,10 @@ def fov_los(level, seer):
     return out
 
 
+# shamelessly stolen from rogue basin
+# https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python
 def bresenham_line(start, end):
-    """ algorithm to calculate lines
-
-    shamelessly stolen from rogue basin
-    https://www.roguebasin.com/index.php/Bresenham%27s_Line_Algorithm#Python
-    """
+    """ algorithm to calculate lines """
 
     x1, y1 = start
     x2, y2 = end

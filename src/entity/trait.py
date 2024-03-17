@@ -97,6 +97,12 @@ def pathfind_trait(parent, target):
     return None
 
 
+def ranged(parent, target):
+    cond1 = parent.equipped["Weapon"].type = "ranged"
+    cond2 = target in parent.fov
+    if cond1 and cond2:
+        pass
+
 
 def target_nearby(parent):
     """ Target any nearby entity (only player for now) """

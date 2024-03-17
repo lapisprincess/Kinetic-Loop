@@ -1,16 +1,18 @@
 """ overarching game system"""
 
 ## IMPORTS
+import random
 import pygame as pg
 
 from level import Level, connect_floors, level_gen
 from gui import GUI
 from tile import standard_tiles
-from entity import player, trait
+from entity import player, trait, parse_entity_data
 
 from util import pathfind, define_controls
 from util.debug import debug
 from util.graphic import tile_width
+from util.fov import fov_los
 
 
 ## CONSTANTS
@@ -60,6 +62,7 @@ class Game:
                 connect_floors(self.all_levels[i-1], self.all_levels[i])
         self.current_level = 1
         self.all_levels[self.current_level].add_gameobj(self.player)
+        self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
 
         if play_test_level:
             self.current_level = 0
@@ -82,7 +85,18 @@ class Game:
         pg.mouse.set_cursor(self.cursor)
 
         # general game variables
-        self.mode = "menu"
+        self.mode = "game"
+
+        # collect all entity data
+        entity_templates = parse_entity_data(self.all_levels)
+
+        # populate dungeon :D
+        for level in self.all_levels:
+            for room in level.get_all_rooms():
+                random_entity = entity_templates[random.randint(0, len(entity_templates)-1)]
+                random_tile = room.get_random_floor()
+                random_coord = random_tile.tile_x, random_tile.tile_y
+                level.add_gameobj(random_entity.clone(), random_coord)
 
 
     def loop(self):
@@ -163,7 +177,7 @@ class Game:
         elif self.game_gui.popout is not None:
             self.game_gui.popout.update()
 
-        if self.player.info["HP"] <= 0:
+        if self.player.info["hp"] <= 0:
             self.game_gui.game_over = True
 
         self.game_gui.info.set_info(self.player.level.info)
