@@ -6,8 +6,8 @@ from gui.panel.level import LevelPanel
 from gui.panel.log import LogPanel
 from gui.panel.info import InfoPanel
 from gui.panel.menu import MenuPanel
-
 from gui.popout import Popout
+from gui.button import Button
 
 from util.tuples import *
 
@@ -32,9 +32,7 @@ game_over_art = pg.image.load("data/bones.png")
 
 
 class GUI():
-    """ user interface object which handles all the graphical stuff 
-
-    """
+    """ user interface object which handles all the graphical stuff """
 
     def __init__(self, screen_size, fonts, level):
         self.screen_size = screen_size
@@ -42,6 +40,7 @@ class GUI():
         self.h1 = fonts['h1']
 
         self.game_over = False
+        self.exit_button = None
 
         self.panels = []
 
@@ -96,6 +95,17 @@ class GUI():
             player level
             most coolest posession
             """
+            
+            render = self.li.render("Exit", None, (0, 0, 0))
+            self.exit_button = Button(
+                (300, 200),
+                (100, 50),
+                (255, 255, 255),
+                exit,
+                text= render
+            )
+            self.exit_button.draw(surface)
+
             return
 
 
@@ -163,6 +173,8 @@ class GUI():
         mouse_pos = pg.mouse.get_pos()
 
         # buttons should only be located in the menu panel or in a popout
-        for button in (self.menu.buttons): #+ self.popout.buttons):
+        for button in self.menu.buttons:
             if button.rect.collidepoint(mouse_pos):
                 button.click()
+        if self.exit_button is not None and self.exit_button.rect.collidepoint(mouse_pos):
+            self.exit_button.click()

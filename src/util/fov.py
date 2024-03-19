@@ -12,18 +12,24 @@ def fov_los(level, seer):
     for tile in level.get_everything_within_range(seer_coord, 5):
         tile_coord = (tile.tile_x, tile.tile_y)
         visible_tiles = bresenham_line(seer_coord, tile_coord)
-        for tile_coord in visible_tiles:
+        for visible_tile_coord in visible_tiles:
 
-            # test for game object
-            gameobj = level.get_game_object(tile_coord[0], tile_coord[1])
-            if gameobj is not None:
+            entity = level.get_entity(visible_tile_coord[0], visible_tile_coord[1])
+            if entity is not None:
+                out.append(entity)
+                if entity.seethrough is False:
+                    break
+
+            # test for other game objects
+            gameobj = level.get_game_object(visible_tile_coord[0], visible_tile_coord[1])
+            if gameobj is not None and gameobj != entity:
                 out.append(gameobj)
                 if gameobj.seethrough is False:
                     break
 
             # test for tile
-            tile = level.get_tile(tile_coord[0], tile_coord[1])
-            if tile is not None:
+            tile = level.get_tile(visible_tile_coord[0], visible_tile_coord[1])
+            if tile is not None and tile in level.get_all_tiles():
                 out.append(tile)
                 if tile.seethrough is False:
                     break

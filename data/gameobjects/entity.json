@@ -7,6 +7,6 @@
         "damage": 3,
         "level": 1,
         "tile": [6, 6],
-        "traits": ["wander", "hostile"]
+        "traits": ["wandering", "hostile"]
     }
 ]}

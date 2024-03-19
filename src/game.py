@@ -1,13 +1,14 @@
 """ overarching game system"""
 
 ## IMPORTS
+import json
 import random
 import pygame as pg
 
 from level import Level, connect_floors, level_gen
 from gui import GUI
 from tile import standard_tiles
-from entity import player, trait, parse_entity_data
+from entity import Entity, player, trait
 
 from util import pathfind, define_controls
 from util.debug import debug
@@ -19,6 +20,7 @@ from util.fov import fov_los
 SCREEN_DIMENSION = 1024, 512
 PLAYER_BGC, PLAYER_FGC = pg.Color('green'), pg.Color('white')
 DATA_PATH = "data/"
+ENTITY_DATA_PATH = open("data/gameobjects/entity.json")
 controls = define_controls(DATA_PATH)
 
 
@@ -110,7 +112,8 @@ class Game:
                 case "menu": running = self.run_menu()
 
 
-    def run_menu(self):
+    def run_menu(self): # TODO
+        """ run the game menu """
         tree_image = pg.image.load("data/tree.jpg")
         self.screen.blit(tree_image, (0,-80))
 
@@ -122,6 +125,7 @@ class Game:
 
 
     def run_game(self):
+        """ main game loop """
         if pg.key.get_pressed()[pg.K_ESCAPE] and self.game_gui.popout is not None:
             self.game_gui.popout = None
 
@@ -184,3 +188,31 @@ class Game:
         self.game_gui.draw(self.screen)
 
         return True
+
+def parse_entity_data(all_levels):
+    entities = []
+
+    entities_data = json.load(ENTITY_DATA_PATH)["entities"]
+    for entity_data in entities_data:
+
+        entity_info = {}
+        entity_info["name"] = entity_data["name"]
+        entity_info["description"] = entity_data["description"]
+        entity_info["hp"] = entity_data["hp"]
+
+        entity_sheet_coord = entity_data["tile"][0], entity_data["tile"][1]
+        new_entity = Entity(
+            sheet_coord =entity_sheet_coord,
+            tile_coord =None,
+            level =all_levels[entity_data["level"]],
+            info_intake =entity_info
+        )
+
+        entity_traits = entity_data["traits"]
+        for entity_trait in entity_traits:
+            new_trait = trait.all_traits[entity_trait]
+            new_entity.traits.add(new_trait)
+
+        entities.append(new_entity)
+
+    return entities

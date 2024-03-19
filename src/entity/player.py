@@ -66,6 +66,14 @@ class Player(Entity):
         stop = False
         message = None
 
+        # check if hostile entities near player
+        for entity in self.level.game_objects:
+            if entity is self or not isinstance(entity, Entity):
+                continue
+            if entity.target is self:
+                message = "hostile entity nearby"
+                stop = True
+
         # try moving
         result = Entity.move(self, self.fast_direction)
         if self.fast_direction is None or result is False:

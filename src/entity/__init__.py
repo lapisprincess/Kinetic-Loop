@@ -1,7 +1,6 @@
 """Universal entity module"""
 
 ## IMPORTS
-import json
 import pygame as pg
 
 from util import graphic
@@ -16,14 +15,11 @@ from gameobj import GameObj
 ## CONSTANTS
 UNARMED_DMG = 5
 FOV_WIDTH = 6
-DATA_FILE = open("data/gameobjects/entity.json")
 
 
 ## ENTITY CLASS
 class Entity(GameObj):
-    """Informal entity class to be inherited
-
-    """
+    """entity class holding all basic entity information """
 
     def __init__(
         self, 
@@ -31,11 +27,17 @@ class Entity(GameObj):
         tile_coord :tuple[int,int] =None,
         colors :tuple[pg.Color,pg.Color] =None, #(bgc, fgc)
         level =None,
-        info :dict =None
+        info_intake :dict =None
     ):
-        
+
+        # dress up given information to make it computer-legible
+        adjusted_info = {}
+        if info_intake is not None:
+            for info in info_intake:
+                adjusted_info[info] = info_intake[info]
+
         # initialize as game object
-        GameObj.__init__(self, sheet_coord, tile_coord, colors, level, info)
+        GameObj.__init__(self, sheet_coord, tile_coord, colors, level, adjusted_info)
 
         # store crucial information
         if "hp" not in self.info:
@@ -69,16 +71,17 @@ class Entity(GameObj):
         self.traits = set()
 
 
+    ## MUTATORS
     def update(self):
-        """ TODO """
+        """ update checks extra entity-specific variables """
         GameObj.update(self)
-
         if self.info["hp"] <= 0:
             self.level.log_message(self.get_info()["name"] + " died!!")
             self.kill()
 
     def take_turn(self):
-        """ TODO """
+        """ take turn, basing action taken on traits and priorities """
+        self.fov = fov_los(self.level, self) # new fov
         for trait in self.traits:
             if trait.priority != 1:
                 continue
@@ -96,6 +99,9 @@ class Entity(GameObj):
                 return True
         return False
 
+    def add_item(self, new_item):
+        """ Give the entity a new item """
+        self.inventory.append(new_item)
 
     def move(self, direction, full_movement=False):
         """ move entity, respecting obstacles.
@@ -112,7 +118,6 @@ class Entity(GameObj):
         # check if entity at new coords, auto-interact if so
         entity = self.level.get(x_coord, y_coord, Entity)
         if entity is not None and full_movement is False:
-            self.attack(entity)
             return False
 
         # see if anything is in the way
@@ -123,25 +128,13 @@ class Entity(GameObj):
         # success!
         self.tile_x = x_coord
         self.tile_y = y_coord
-        self.fov = fov_los(self.level, self) # new fov
         return True
 
-
-    # default info provider, filling in missing key info
-    def get_info(self):
-        """ TODO """
-        if "name" not in self.info:
-            self.info["name"] = "leafling"
-        if "image" not in self.info:
-            self.info["image"] = self.image
-
-        return self.info
-
-
     def attack(self, target):
-        self.attack_melee(target)
+        """ for now, only melee combat is ready """
+        self._attack_melee(target)
 
-    def attack_ranged(self, target):
+    def _attack_ranged(self, target):
         """ TODO """
         if target not in self.fov:
             self.level.log_message("Out of range!")
@@ -167,8 +160,8 @@ class Entity(GameObj):
         self.info["HP"] -= dmg
         target.update()
 
-    def attack_melee(self, target):
-        """ TODO """
+    def _attack_melee(self, target):
+        """ combat with adjacent targets """
         weapon = self.equipped["weapon"]
         if weapon is not None and weapon.type == "melee":
             dmg = weapon.dmg
@@ -179,17 +172,38 @@ class Entity(GameObj):
 
         message = self.get_info()["name"]
         message += " attacked " + target.get_info()["name"]
-        message += " for " + str(dmg) + " damage "
+        message += " for " + str(dmg) + " damage"
         message += " with their " + weapon_name + "!"
         self.level.log_message(message)
 
-        self.info["hp"] -= dmg
+        target.info["hp"] -= dmg
         target.update()
 
-    def add_item(self, new_item):
-        """ Give the entity a new item """
-        self.inventory.append(new_item)
 
+    ## GETTERS
+    def get_info(self):
+        """ info getter which fills in necessary information """
+        if "name" not in self.info:
+            self.info["name"] = "leafling"
+        if "image" not in self.info:
+            self.info["image"] = self.image
+
+        return self.info
+
+    def get_surrounding_game_objects(self):
+        """ returns a list of game objects directly around the entity """
+        all_gameobjs = []
+        for direction in directionality.all_directions:
+            x = self.tile_x + directionality.necessary_movement(direction)[0]
+            y = self.tile_y + directionality.necessary_movement(direction)[1]
+            gameobj = self.level.get_game_object(x, y)
+            if gameobj is not None:
+                print("dfsjkll")
+                all_gameobjs.append(gameobj)
+        return all_gameobjs
+
+
+    ## MISC
     def clone(self, tile_x:int =None, tile_y:int =None):
         """ Method to create a duplicate of entity,
         useful for creating duplicatable template entities! """
@@ -198,7 +212,7 @@ class Entity(GameObj):
         if tile_y is None:
             tile_y = self.tile_y
 
-        return Entity(
+        new_entity = Entity(
             self.sheet_coord,
             (tile_x, tile_y),
             self.colors,
@@ -206,25 +220,7 @@ class Entity(GameObj):
             self.info
         )
 
-
-
-def parse_entity_data(all_levels):
-    entities = []
-
-    entities_data = json.load(DATA_FILE)["entities"]
-    for entity_data in entities_data:
-
-        entity_info = {}
-        entity_info["name"] = entity_data["name"]
-        entity_info["description"] = entity_data["description"]
-        entity_info["hp"] = entity_data["hp"]
-
-        entity_sheet_coord = entity_data["tile"][0], entity_data["tile"][1]
-        entities.append(Entity(
-            sheet_coord =entity_sheet_coord,
-            tile_coord =None,
-            level =all_levels[entity_data["level"]],
-            info = entity_info
-        ))
-
-    return entities
+        for trait in self.traits:
+            new_entity.traits.add(trait)
+        
+        return new_entity

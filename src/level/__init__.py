@@ -53,9 +53,7 @@ class Level(pg.Rect):
 
     ### DRAW METHODS ###
     def draw(self, surface):
-        """ TODO """
-        print("level ", self.name)
-        print("shadows ", len(self.shadows))
+        """ draw everything included in the level """
         self.surface.fill("black")
 
         self._draw_shadows()
@@ -69,10 +67,9 @@ class Level(pg.Rect):
     # draw specifically known tiles that are out of view
     def _draw_shadows(self):
         for shadow_tile in self.shadows:
-            if shadow_tile is None:
-                continue
-            shadow_tile.image.set_alpha(100)
-            self.surface.blit(shadow_tile.image, shadow_tile.rect)
+            if shadow_tile is not None and shadow_tile in self.get_all_tiles():
+                shadow_tile.image.set_alpha(100)
+                self.surface.blit(shadow_tile.image, shadow_tile.rect)
 
     # draw everything within view
     def _draw_everything(self):
@@ -143,10 +140,12 @@ class Level(pg.Rect):
                         self.player.attack_ranged(self.get(cursor_pos[0], cursor_pos[1]))
                         self.toggle_looking()
 
-            # adjust visibility around player
+            # toggle whether everything is visible or not
             if not self.visibility:
                 for tile in self.get_all_tiles():
                     tile.visible = True
+                for gameobj in self.game_objects:
+                    gameobj.visible = True
 
             if self.visibility and self.player.fov is not None:
                 for gameobj in self.game_objects:
@@ -226,7 +225,7 @@ class Level(pg.Rect):
         search_coord = (tile_x, tile_y)
 
         for gameobj in self.game_objects:
-            if gameobj is None or None in (gameobj.tile_x, gameobj.tile_y):
+            if gameobj is None:
                 continue
             gameobj_coord = (gameobj.tile_x, gameobj.tile_y)
             if search_coord == gameobj_coord:
@@ -234,9 +233,14 @@ class Level(pg.Rect):
                     return gameobj
         return None
 
+    def get_entity(self, tile_x, tile_y):
+        """ this method shouldn't be necessary, but here we are. """
+        return self.get_game_object(tile_x, tile_y, Entity)
+        # would you call bad inheritance 'code incest?'
+    
     def get_tile(self, tile_x, tile_y, tp=None):
         """ get any tile on the board """
-        search_coord = (tile_x, tile_y)
+        search_coord = tile_x, tile_y
 
         for room in self.rooms:
             for tile in room.tiles:
@@ -254,9 +258,8 @@ class Level(pg.Rect):
         out = []
         for room in self.rooms:
             for tile in room.tiles:
-                if tile is None:
-                    continue
-                out.append(tile)
+                if tile is not None:
+                    out.append(tile)
         return out
 
     def get_pixel(self, pixel_x, pixel_y, tp=None):
@@ -403,8 +406,6 @@ class Level(pg.Rect):
         self.cursor.tile_x = self.player.tile_x
         self.cursor.tile_y = self.player.tile_y
         self.cursor.update()
-
-
 
 
 def connect_floors(lower, upper):

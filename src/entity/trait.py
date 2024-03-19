@@ -107,9 +107,20 @@ def ranged(parent, target):
 def target_nearby(parent):
     """ Target any nearby entity (only player for now) """
     if parent.target is None:
+        for gameobj in parent.get_surrounding_game_objects():
+            if gameobj is parent.target:
+                parent.attack(parent.target)
         for thing in parent.fov:
             if isinstance(thing, Player):
                 parent.target = thing
                 return True
     return pathfind_trait(parent, parent.target)
 hostile = Trait(2, target_nearby)
+
+
+all_traits = {
+    "hostile": hostile,
+    "wandering": wandering,
+    "controllable": controllable,
+    "fully_controllable": fully_controllable,
+}
