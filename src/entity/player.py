@@ -48,8 +48,10 @@ class Player(Entity):
         self.fov = fov_los(self.level, self) # player fov should always be up to date
 
     def move(self, direction, full_movement=False):
-        """ player movement should also account for stairs """
-        result = Entity.move(self, direction, full_movement)
+        """ player movement has some special features:
+        player movement should also account for stairs
+        player bumping into entity leads to attack """
+        result = Entity.move(self, direction, full_movement, attack_on_move=True)
 
         if direction in ("up", "down"):
             # check if player walking up/down stairs

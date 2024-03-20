@@ -1,4 +1,4 @@
-"""Universal entity module"""
+""" universal entity module """
 
 ## IMPORTS
 import pygame as pg
@@ -19,7 +19,7 @@ FOV_WIDTH = 6
 
 ## ENTITY CLASS
 class Entity(GameObj):
-    """entity class holding all basic entity information """
+    """ entity class holding all basic entity information """
 
     def __init__(
         self, 
@@ -103,7 +103,7 @@ class Entity(GameObj):
         """ Give the entity a new item """
         self.inventory.append(new_item)
 
-    def move(self, direction, full_movement=False):
+    def move(self, direction, full_movement=False, attack_on_move=False):
         """ move entity, respecting obstacles.
         returns true if move successful, false otherwise """
 
@@ -118,6 +118,8 @@ class Entity(GameObj):
         # check if entity at new coords, auto-interact if so
         entity = self.level.get(x_coord, y_coord, Entity)
         if entity is not None and full_movement is False:
+            if attack_on_move:
+                self.attack(entity)
             return False
 
         # see if anything is in the way
@@ -198,7 +200,6 @@ class Entity(GameObj):
             y = self.tile_y + directionality.necessary_movement(direction)[1]
             gameobj = self.level.get_game_object(x, y)
             if gameobj is not None:
-                print("dfsjkll")
                 all_gameobjs.append(gameobj)
         return all_gameobjs
 

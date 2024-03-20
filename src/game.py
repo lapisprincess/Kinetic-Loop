@@ -53,15 +53,25 @@ class Game:
         self.all_levels = [test_level]
         for i in range(1, 9):
             new_name = "level" + str(i)
-            new_level = Level(
-                tile_width, (500, 500),
-                controls, visibility=setFOV,
-                name=new_name
-            )
-            level_gen.generate_floor(new_level, 8, grass, woodwall)
+
+            # loop until we generate a fully connected floor
+            # takes a while... but fuck it
+            valid = False
+            while not valid:
+                new_level = Level(
+                    tile_width, (500, 500),
+                    controls, visibility=setFOV,
+                    name=new_name
+                )
+                level_gen.generate_floor(new_level, 8, grass, woodwall)
+                new_level.kill_orphans()
+                valid = new_level.validate()
+                valid &= len(new_level.get_all_rooms()) > 0
+
             self.all_levels.append(new_level)
             if i >= 2:
                 connect_floors(self.all_levels[i-1], self.all_levels[i])
+
         self.current_level = 1
         self.all_levels[self.current_level].add_gameobj(self.player)
         self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
@@ -95,6 +105,8 @@ class Game:
         # populate dungeon :D
         for level in self.all_levels:
             for room in level.get_all_rooms():
+                if random.randint(0, 3):
+                    continue # 1/3 chance the room is empty
                 random_entity = entity_templates[random.randint(0, len(entity_templates)-1)]
                 random_tile = room.get_random_floor()
                 random_coord = random_tile.tile_x, random_tile.tile_y

@@ -6,11 +6,10 @@ import math
 
 import pygame as pg
 
-from util import graphic
-from util.space import pixel_collide, pixel_distance
+from util.space import pixel_distance
+from util import pathfind as pf
 
 from entity.player import Player
-from entity.npc import NPC
 from entity import trait, Entity
 
 from level.room import Room
@@ -93,7 +92,7 @@ class Level(pg.Rect):
             if isinstance(gameobj, Player):
                 self.player = gameobj
 
-        # updates and adjustments
+        # general updates and adjustments
         for gameobj in self.game_objects:
             gameobj.update()
         for room in self.rooms:
@@ -373,7 +372,7 @@ class Level(pg.Rect):
         self.rooms.append(new_room)
         return new_room
 
-    def connect_rooms(self, room1, room2, max_dist = None):
+    def connect_rooms(self, room1, room2, max_dist = 8):
         """ connect two rooms via tunnel """
         new_tunnel = Tunnel(
             room1, room2,
@@ -392,6 +391,10 @@ class Level(pg.Rect):
 
         if new_tunnel is None:
             return False
+
+        # successful connection
+        room1.connections.append(room2)
+        room2.connections.append(room1)
         new_tunnel = Tunnel(
             room1, room2,
             room1.floor, room1.wall,
@@ -399,6 +402,29 @@ class Level(pg.Rect):
         )
         self.rooms.append(new_tunnel)
         return True
+
+    def validate(self):
+        """ ensures every room is connected to every other room TODO """
+        for room1 in self.get_all_rooms():
+            for room2 in self.get_all_rooms():
+                if room1 is room2:
+                    continue
+                tile1 = room1.get_random_floor()
+                center1 = tile1.tile_x, tile1.tile_y
+                tile2 = room2.get_random_floor()
+                center2 = tile2.tile_x, tile2.tile_y
+                if pf.pathfind(center1, center2, self) is None:
+                    return False
+        return True
+
+
+    def kill_orphans(self):
+        """ there were orphan rooms.
+        This method kills orphans (just like me fr). """
+
+        for room in self.get_all_rooms():
+            if len(room.connections) == 0:
+                self.rooms.remove(room)
 
     def toggle_looking(self):
         """ toggle whether the player is in look mode or not """
