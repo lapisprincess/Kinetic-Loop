@@ -104,13 +104,13 @@ class Level(pg.Rect):
         if self.player is not None:
             # automatically fast move player
             if self.player.fast_direction is not None:
-                self.player.fast_move()
-                self._take_entity_turns()
+                if self.player.fast_move():
+                    self._take_entity_turns()
 
             # automatically move player along travel path
             elif self.player.travel_path is not None:
-                self.player.travel()
-                self._take_entity_turns()
+                if self.player.travel():
+                    self._take_entity_turns()
 
             # process player input
             elif check_input:

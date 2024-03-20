@@ -97,6 +97,8 @@ class Player(Entity):
             self.level.log_message("Stopped automoving (" + message + ")")
             self.fast_direction = None
             self.current_room = None
+            return False
+        return True
 
     def travel(self):
         """ fast travel to travel_dest """
@@ -106,11 +108,15 @@ class Player(Entity):
             if entity is self or not isinstance(entity, Entity):
                 continue
             if entity.target is self:
-                stop, message = True, "hostile entity nearby"
+                self.travel_path = None
+                message = "hostile entity nearby"
+                self.level.log_message("Stopped traveling (" + message + ")")
+                return False
 
+        # general travel cases
         if len(self.travel_path) == 0:
             self.travel_path = None
-        elif stop:
-            self.level.log_message("Stopped traveling (" + message + ")")
+            return False
         elif self.travel_path is not None:
             self.move(self.travel_path.pop())
+            return True

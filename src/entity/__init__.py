@@ -201,7 +201,6 @@ class Entity(GameObj):
             y = self.tile_y + directionality.necessary_movement(direction)[1]
             gameobj = self.level.get_entity(x, y)
             if gameobj is not None and isinstance(gameobj, Entity):
-                print(gameobj)
                 all_gameobjs.append(gameobj)
         return all_gameobjs
 
