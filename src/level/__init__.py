@@ -265,16 +265,8 @@ class Level(pg.Rect):
         """ abstract getter to grab anything of a given type, given pixel coord """
         pixel_x /= self.tile_width
         pixel_y /= self.tile_width
-        gameobj = self.get_game_object(pixel_x, pixel_y, tp)
-        if gameobj is not None:
-            return gameobj
 
-        tile = self.get_tile(pixel_x, pixel_y, tp)
-        if tile is not None:
-            return tile
-
-        # nothing found :(
-        return None
+        return self.get(round(pixel_x), round(pixel_y), tp)
 
     def get_everything_within_range(self, center_tile_coord, tile_distance):
         """ get everything within a tile distance """

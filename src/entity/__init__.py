@@ -120,6 +120,7 @@ class Entity(GameObj):
         if entity is not None and full_movement is False:
             if attack_on_move:
                 self.attack(entity)
+                return True
             return False
 
         # see if anything is in the way

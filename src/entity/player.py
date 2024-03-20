@@ -100,7 +100,17 @@ class Player(Entity):
 
     def travel(self):
         """ fast travel to travel_dest """
+
+        # check if hostile entities near player
+        for entity in self.level.game_objects:
+            if entity is self or not isinstance(entity, Entity):
+                continue
+            if entity.target is self:
+                stop, message = True, "hostile entity nearby"
+
         if len(self.travel_path) == 0:
             self.travel_path = None
+        elif stop:
+            self.level.log_message("Stopped traveling (" + message + ")")
         elif self.travel_path is not None:
             self.move(self.travel_path.pop())

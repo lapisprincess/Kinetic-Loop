@@ -10,7 +10,7 @@ from gui import GUI
 from tile import standard_tiles
 from entity import Entity, player, trait
 
-from util import pathfind, define_controls
+from util import pathfind as pf, define_controls
 from util.debug import debug
 from util.graphic import tile_width
 from util.fov import fov_los
@@ -182,7 +182,7 @@ class Game:
                 if new_loc is not None:
                     player_coord = (self.player.tile_x, self.player.tile_y)
                     player_level = self.player.level
-                    path = pathfind(player_coord, new_loc, player_level)
+                    path = pf.pathfind(player_coord, new_loc, player_level)
                     self.player.travel_path = path
 
                 # click on buttons
