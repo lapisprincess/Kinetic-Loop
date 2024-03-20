@@ -11,6 +11,7 @@ from game import Game
 arguments = sys.argv
 setFOV = bool('nofov' not in arguments)
 testroom = bool('testroom' in arguments)
+stg = bool('stg' in arguments)
 
 ## INITIATE SETTINGS
 
@@ -19,7 +20,7 @@ pg.init()
 pg.display.set_caption("🍃Leaflings🍂")
 
 ## CREATE GAME OBJECT
-game = Game(setFOV, testroom)
+game = Game(setFOV, testroom, stg)
 
 game.loop()
 

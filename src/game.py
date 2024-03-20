@@ -38,7 +38,7 @@ test_level.connect_rooms(room2, room1)
 test_level.connect_rooms(room3, room1)
 
 class Game:
-    def __init__(self, setFOV, play_test_level):
+    def __init__(self, setFOV, play_test_level, stg=False):
 
         # game utilities
         self.screen = pg.display.set_mode(SCREEN_DIMENSION)
@@ -51,7 +51,7 @@ class Game:
 
         # set up full dungeon
         self.all_levels = [test_level]
-        for i in range(1, 9):
+        for i in range(1, 8):
             new_name = "level" + str(i)
 
             # loop until we generate a fully connected floor
@@ -99,17 +99,21 @@ class Game:
         pg.mouse.set_cursor(self.cursor)
 
         # general game variables
-        self.mode = "game"
+        self.mode = "menu"
+        if stg:
+            self.mode = "game"
 
         # collect all entity data
         entity_templates = parse_entity_data(self.all_levels)
 
         # populate dungeon :D
-        for level in self.all_levels:
+        entities_so_far = []
+        for i, level in enumerate(self.all_levels[1:]):
+            entities_so_far += entity_templates[i]
             for room in level.get_all_rooms():
                 if random.randint(0, 5) == 0:
                     continue # 1/5 chance the room is empty
-                random_entity = entity_templates[random.randint(0, len(entity_templates)-1)]
+                random_entity = entities_so_far[random.randint(0, len(entities_so_far)-1)]
                 random_tile = room.get_random_floor()
                 random_coord = random_tile.tile_x, random_tile.tile_y
                 while level.get_game_object(random_coord[0], random_coord[1]) != None:
@@ -119,6 +123,7 @@ class Game:
 
 
     def loop(self):
+        """ main game loop which shoudl run everything """
         running = True
         while running:
             pg.display.flip()
@@ -207,29 +212,32 @@ class Game:
         return True
 
 def parse_entity_data(all_levels):
-    entities = []
+    level_entities = [[]]
+
+    for level in all_levels:
+        level_entities.append([])
 
     entities_data = json.load(ENTITY_DATA_PATH)["entities"]
-    for entity_data in entities_data:
+    for raw_entity_data in entities_data:
 
         entity_info = {}
-        entity_info["name"] = entity_data["name"]
-        entity_info["description"] = entity_data["description"]
-        entity_info["hp"] = entity_data["hp"]
+        entity_info["name"] = raw_entity_data["name"]
+        entity_info["description"] = raw_entity_data["description"]
+        entity_info["hp"] = raw_entity_data["hp"]
 
-        entity_sheet_coord = entity_data["tile"][0], entity_data["tile"][1]
+        entity_sheet_coord = raw_entity_data["tile"][0], raw_entity_data["tile"][1]
         new_entity = Entity(
             sheet_coord =entity_sheet_coord,
             tile_coord =None,
-            level =all_levels[entity_data["level"]],
+            level =all_levels[raw_entity_data["level"]],
             info_intake =entity_info
         )
 
-        entity_traits = entity_data["traits"]
+        entity_traits = raw_entity_data["traits"]
         for entity_trait in entity_traits:
             new_trait = trait.all_traits[entity_trait]
             new_entity.traits.add(new_trait)
 
-        entities.append(new_entity)
+        level_entities[raw_entity_data["level"]-1].append(new_entity)
 
-    return entities
+    return level_entities
