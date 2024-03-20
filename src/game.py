@@ -66,7 +66,9 @@ class Game:
                 level_gen.generate_floor(new_level, 8, grass, woodwall)
                 new_level.kill_orphans()
                 valid = new_level.validate()
-                valid &= len(new_level.get_all_rooms()) > 0
+                if not valid:
+                    continue
+                valid &= len(new_level.get_all_rooms()) > 3 # at least 4 rooms
 
             self.all_levels.append(new_level)
             if i >= 2:
@@ -105,11 +107,14 @@ class Game:
         # populate dungeon :D
         for level in self.all_levels:
             for room in level.get_all_rooms():
-                if random.randint(0, 3):
-                    continue # 1/3 chance the room is empty
+                if random.randint(0, 5) == 0:
+                    continue # 1/5 chance the room is empty
                 random_entity = entity_templates[random.randint(0, len(entity_templates)-1)]
                 random_tile = room.get_random_floor()
                 random_coord = random_tile.tile_x, random_tile.tile_y
+                while level.get_game_object(random_coord[0], random_coord[1]) != None:
+                    random_tile = room.get_random_floor()
+                    random_coord = random_tile.tile_x, random_tile.tile_y
                 level.add_gameobj(random_entity.clone(), random_coord)
 
 
