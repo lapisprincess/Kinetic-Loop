@@ -6,7 +6,7 @@ from gui.panel.level import LevelPanel
 from gui.panel.log import LogPanel
 from gui.panel.info import InfoPanel
 from gui.panel.menu import MenuPanel
-from gui.popout import Popout
+
 from gui.button import Button
 
 from util.tuples import *
@@ -27,8 +27,6 @@ INFO_DIMEN = (0.25, 0.75)
 MENU_COORD = (0.75, 0.75)
 MENU_DIMEN = (0.25, 0.25)
 
-# path to game over art
-game_over_art = pg.image.load("data/bones.png")
 
 
 class GUI():
@@ -39,15 +37,9 @@ class GUI():
         self.li = fonts['li']
         self.h1 = fonts['h1']
 
-        self.game_over = False
         self.exit_button = None
 
         self.panels = []
-
-        popout_size = (screen_size[0] - 60, screen_size[1] - 60)
-        sample_popout = Popout((30, 30), popout_size)
-        self.popout = None
-
 
         # level panel
         level_coord = multiply_tuples(LEVEL_COORD, screen_size)
@@ -80,43 +72,11 @@ class GUI():
     def draw(self, surface):
         """ general drawer for all GUI elements """
 
-        # draw game-over menu if needed
-        if self.game_over:
-            surface.fill("#dddcc9")
-            screenx, screeny = self.screen_size[0], self.screen_size[1]
-            surface.blit(game_over_art, (0, self.screen_size[1] - 240))
-
-            render = self.h1.render("You died!", None, (0, 0, 0))
-            surface.blit(render, (screenx * 3/5, screeny * 1/7))
-
-            """
-            stats to print:
-            level
-            player level
-            most coolest posession
-            """
-            
-            render = self.li.render("Exit", None, (0, 0, 0))
-            self.exit_button = Button(
-                (300, 200),
-                (100, 50),
-                (255, 255, 255),
-                exit,
-                text= render
-            )
-            self.exit_button.draw(surface)
-
-            return
-
 
         # draw panels
         self.level.draw(surface)
         self.log.draw(surface)
         self.info.draw(surface, self.li, self.h1)
-        self.menu.draw(surface)
-        if self.popout is not None:
-            self.popout.draw(surface)
-
 
     def change_level(self, new_level):
         """ adjust the gui to reflect the current level """

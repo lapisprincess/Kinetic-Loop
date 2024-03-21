@@ -6,7 +6,6 @@ import random
 import pygame as pg
 
 from level import Level, connect_floors, level_gen
-from gui import GUI
 from tile import standard_tiles
 from entity import Entity, player, trait
 
@@ -14,6 +13,10 @@ from util import pathfind as pf, define_controls
 from util.debug import debug
 from util.graphic import tile_width
 from util.fov import fov_los
+
+from gui import GUI
+from gui.menu.mainmenu import MainMenu
+from gui.menu.gameover import GameOverMenu
 
 
 ## CONSTANTS
@@ -23,73 +26,27 @@ DATA_PATH = "data/"
 ENTITY_DATA_PATH = open("data/gameobjects/entity.json")
 controls = define_controls(DATA_PATH)
 
-
-## TEST LEVEL
-test_level = Level(
-    tile_width, (500, 500),
-    name="test_level"
-)
-cobble_floor, cobble_wall = standard_tiles["cobble_floor"], standard_tiles["cobble_wall"]
-grass, woodwall = standard_tiles["grass"], standard_tiles["woodwall"]
-room1 = test_level.build_room((0, 5), (5, 10), cobble_floor, cobble_wall)
-room2 = test_level.build_room((15, 5), (10, 10), cobble_floor, cobble_wall)
-room3 = test_level.build_room((0, 15), (5, 15), cobble_floor, cobble_wall)
-test_level.connect_rooms(room2, room1)
-test_level.connect_rooms(room3, room1)
-
 class Game:
-    def __init__(self, setFOV, play_test_level, stg=False):
+    def __init__(self, setFOV, stg=False):
+
+        # determine if we're jumping straight into the game (stg)
+        self.mode = "menu"
+        if stg:
+            self.mode = "game"
 
         # game utilities
         self.screen = pg.display.set_mode(SCREEN_DIMENSION)
         self.clock = pg.time.Clock()
 
-        # set up player
-        player_colors = PLAYER_BGC, PLAYER_FGC
-        self.player = player.Player((0,4), colors=player_colors)
-        self.player.traits.add(trait.controllable)
-
-        # set up full dungeon
-        self.all_levels = [test_level]
-        for i in range(1, 8):
-            new_name = "level" + str(i)
-
-            # loop until we generate a fully connected floor
-            # takes a while... but fuck it
-            valid = False
-            while not valid:
-                new_level = Level(
-                    tile_width, (500, 500),
-                    controls, visibility=setFOV,
-                    name=new_name
-                )
-                level_gen.generate_floor(new_level, 8, grass, woodwall)
-                new_level.kill_orphans()
-                valid = new_level.validate()
-                if not valid:
-                    continue
-                valid &= len(new_level.get_all_rooms()) > 3 # at least 4 rooms
-
-            self.all_levels.append(new_level)
-            if i >= 2:
-                connect_floors(self.all_levels[i-1], self.all_levels[i])
-
-        self.current_level = 1
-        self.all_levels[self.current_level].add_gameobj(self.player)
-        self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
-
-        if play_test_level:
-            self.current_level = 0
-
         # fonts
         li_font = pg.font.Font("data/font.otf", size=14)
         h1_font = pg.font.Font("data/font.otf", size=20)
-        all_fonts = { 'li': li_font, 'h1': h1_font, }
+        self.all_fonts = { 'li': li_font, 'h1': h1_font, }
 
-        # gui initialization
-        self.game_gui = GUI(SCREEN_DIMENSION, all_fonts, self.player.level)
-        for level in self.all_levels: # link gui to levels
-            level.log = self.game_gui.log
+        # make main menu
+        self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts)
+        self.gameovermenu = GameOverMenu(SCREEN_DIMENSION, self.all_fonts)
+        self.menu = self.mainmenu
 
         # cursor stuffs
         cursor_img = pg.image.load("data/cursor.png")
@@ -98,17 +55,59 @@ class Game:
         self.cursor_pressed = pg.cursors.Cursor((0, 0), cursor_pressed_img)
         pg.mouse.set_cursor(self.cursor)
 
-        # general game variables
-        self.mode = "menu"
-        if stg:
-            self.mode = "game"
+        # jump straight into generating a level
+        if self.mode == "game":
+            self._setup_game(setFOV)
+
+    def _setup_game(self, setFOV):
+        """ detailed 8-level dungeon generator """
+
+        # set up player
+        player_colors = PLAYER_BGC, PLAYER_FGC
+        self.player = player.Player((0,4), colors=player_colors)
+        self.player.traits.add(trait.controllable)
+
+        # set up full dungeon
+        self.all_levels = []
+        for i in range(1, 8):
+            new_name = "level" + str(i)
+
+            # loop until we generate a fully connected floor
+            # takes a while... but these rooms need to be clean
+            valid = False
+            while not valid:
+                new_level = Level(
+                    tile_width, (500, 500),
+                    controls, visibility=setFOV,
+                    name=new_name
+                )
+                standard_tiles
+                level_gen.generate_floor(new_level, 8, standard_tiles["grass"], standard_tiles["woodwall"])
+                new_level.kill_orphans()
+                valid = new_level.validate()
+                if not valid:
+                    continue
+                valid &= len(new_level.get_all_rooms()) > 3 # at least 4 rooms
+
+            self.all_levels.append(new_level)
+            if i >= 2:
+                connect_floors(self.all_levels[i-2], self.all_levels[i-1])
+
+        self.current_level = 0
+        self.all_levels[self.current_level].add_gameobj(self.player)
+        self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
+
+        # gui initialization
+        self.game_gui = GUI(SCREEN_DIMENSION, self.all_fonts, self.player.level)
+        for level in self.all_levels: # link gui to levels
+            level.log = self.game_gui.log
 
         # collect all entity data
         entity_templates = parse_entity_data(self.all_levels)
 
-        # populate dungeon :D
+        # populate dungeon
         entities_so_far = []
-        for i, level in enumerate(self.all_levels[1:]):
+        for i, level in enumerate(self.all_levels):
             entities_so_far += entity_templates[i]
             for room in level.get_all_rooms():
                 if random.randint(0, 5) == 0:
@@ -123,7 +122,7 @@ class Game:
 
 
     def loop(self):
-        """ main game loop which shoudl run everything """
+        """ main game loop which runs everything """
         running = True
         while running:
             pg.display.flip()
@@ -136,20 +135,30 @@ class Game:
 
     def run_menu(self): # TODO
         """ run the game menu """
-        tree_image = pg.image.load("data/tree.jpg")
-        self.screen.blit(tree_image, (0,-80))
+
+        self.screen.fill("black")
+        self.menu.update()
+        self.menu.draw(self.screen)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return False
+
+            # manage mouse behavior
+            if event.type == pg.MOUSEBUTTONDOWN:
+                pg.mouse.set_cursor(self.cursor_pressed)
+
+                # click on buttons
+                self.menu.click_button()
+            else: pg.mouse.set_cursor(self.cursor)
 
         return True
 
 
     def run_game(self):
         """ main game loop """
-        if pg.key.get_pressed()[pg.K_ESCAPE] and self.game_gui.popout is not None:
-            self.game_gui.popout = None
+        if pg.key.get_pressed()[pg.K_ESCAPE] and self.game_gui.menu is not None:
+            self.game_gui.menu = None
 
         self.game_gui.change_level(self.player.level)
 
@@ -192,18 +201,20 @@ class Game:
 
                 # click on buttons
                 self.game_gui.click_button()
-                if self.game_gui.popout is None:
+                if self.game_gui.menu is None:
                     self.game_gui.menu.click()
             else: pg.mouse.set_cursor(self.cursor)
 
         self.screen.fill("black")
-        if self.game_gui.popout is None and not self.game_gui.log.typing:
-            self.player.level.update(check_input)
-            self.game_gui.update()
-        elif self.game_gui.popout is not None:
-            self.game_gui.popout.update()
+        #if self.game_gui.menu is None and not self.game_gui.log.typing:
+        self.player.level.update(check_input)
+        self.game_gui.update()
+        #elif self.game_gui.menu is not None:
+        #    self.game_gui.menu.update()
 
         if self.player.info["hp"] <= 0:
+            self.mode = "menu"
+            self.menu = self.gameovermenu
             self.game_gui.game_over = True
 
         self.game_gui.info.set_info(self.player.level.info)
@@ -212,20 +223,24 @@ class Game:
         return True
 
 def parse_entity_data(all_levels):
+    """ transform json data into entity templates """
     level_entities = [[]]
 
-    for level in all_levels:
+    # initialize output list
+    for i in all_levels:
         level_entities.append([])
 
     entities_data = json.load(ENTITY_DATA_PATH)["entities"]
     for raw_entity_data in entities_data:
 
+        # gather preliminary data
         entity_info = {}
         entity_info["name"] = raw_entity_data["name"]
         entity_info["description"] = raw_entity_data["description"]
         entity_info["hp"] = raw_entity_data["hp"]
+        entity_sheet_coord = raw_entity_data["tile"]
 
-        entity_sheet_coord = raw_entity_data["tile"][0], raw_entity_data["tile"][1]
+        # create entity
         new_entity = Entity(
             sheet_coord =entity_sheet_coord,
             tile_coord =None,
@@ -233,11 +248,13 @@ def parse_entity_data(all_levels):
             info_intake =entity_info
         )
 
+        # handle traits
         entity_traits = raw_entity_data["traits"]
         for entity_trait in entity_traits:
             new_trait = trait.all_traits[entity_trait]
             new_entity.traits.add(new_trait)
 
+        # stow entity
         level_entities[raw_entity_data["level"]-1].append(new_entity)
 
     return level_entities

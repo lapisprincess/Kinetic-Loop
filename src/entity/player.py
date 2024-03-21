@@ -9,7 +9,6 @@ from util.fov import fov_los
 from prop.stairs import Stairs
 
 from entity import Entity
-from entity.npc import NPC
 
 
 ### PLAYER CLASS ###
@@ -43,8 +42,7 @@ class Player(Entity):
         """ constant updater """
         Entity.update(self)
         for tile in self.fov:
-            if not isinstance(tile, NPC):
-                self.level.shadows.add(tile)
+            self.level.shadows.add(tile)
         self.fov = fov_los(self.level, self) # player fov should always be up to date
 
     def move(self, direction, full_movement=False):

@@ -1,9 +1,6 @@
 ### IMPORTS ###
 import pygame as pg
 
-from gui.panel import Panel
-from gui.popout import Popout
-from level import Level
 
 ### BUTTON CLASS ###
 class Button(pg.Surface):

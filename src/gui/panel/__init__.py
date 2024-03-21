@@ -18,6 +18,8 @@ class Panel(pg.Surface):
         self.mid = None
         self.fonts=fonts
 
+        self.buttons = []
+
 
     def set_border(self, mid_color=None, alt=False):
         """ add a border around the panel """
@@ -44,6 +46,18 @@ class Panel(pg.Surface):
     def draw(self, surface):
         """ panel drawer """
         surface.blit(self, (self.rect.left, self.rect.top))
+        for button in self.buttons:
+            button.draw(surface)
+
+
+    def click_button(self):
+        """ click buttons on the panel """
+        mouse_pos = pg.mouse.get_pos()
+        for button in self.buttons:
+            if button.rect.collidepoint(mouse_pos):
+                button.click()
+
+
 
     def update(self):
         """ placeholder update method in case of idle panel """

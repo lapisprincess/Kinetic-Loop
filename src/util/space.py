@@ -1,4 +1,4 @@
-""" random spatial methods """
+""" old spatial methods """
 import math
 
 def pixel_collide(
