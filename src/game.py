@@ -44,7 +44,7 @@ class Game:
         self.all_fonts = { 'li': li_font, 'h1': h1_font, }
 
         # make main menu
-        self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts)
+        self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts, self)
         self.gameovermenu = GameOverMenu(SCREEN_DIMENSION, self.all_fonts)
         self.menu = self.mainmenu
 
@@ -57,9 +57,9 @@ class Game:
 
         # jump straight into generating a level
         if self.mode == "game":
-            self._setup_game(setFOV)
+            self.setup_game(setFOV)
 
-    def _setup_game(self, setFOV):
+    def setup_game(self, setFOV):
         """ detailed 8-level dungeon generator """
 
         # set up player
@@ -147,8 +147,6 @@ class Game:
             # manage mouse behavior
             if event.type == pg.MOUSEBUTTONDOWN:
                 pg.mouse.set_cursor(self.cursor_pressed)
-
-                # click on buttons
                 self.menu.click_button()
             else: pg.mouse.set_cursor(self.cursor)
 

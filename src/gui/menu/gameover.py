@@ -3,8 +3,8 @@
 ### IMPORTS ###
 import pygame as pg
 
-from gui.button import Button
-from gui.panel import Panel
+from gui import Button
+from gui import Panel
 
 
 ### CONSTANTS ###

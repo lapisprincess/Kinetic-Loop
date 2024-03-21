@@ -55,9 +55,3 @@ class Button(pg.Surface):
 def toggle_looking(level):
     if type(level) == level: 
         level.toggle_looking()
-
-def test_panel(gui):
-    pass
-    #popout_size = (gui.screen_size[0] - 60, gui.screen_size[1] - 60)
-    #sample_popout = Popout((30, 30), popout_size)
-    #gui.popout = sample_popout

@@ -23,15 +23,6 @@ class MenuPanel(Panel):
         )
         self.buttons.append(self.look_button)
 
-        # test menu button
-        test_coord = (pixel_coord[0] + button_dimen[0], pixel_coord[1])
-        test_color = (100, 255, 100)
-        self.test_button = button.Button(
-            test_coord, button_dimen, test_color,
-            button.test_panel, gui
-        )
-        self.buttons.append(self.test_button)
-
 
 
     def draw(self, surface):
