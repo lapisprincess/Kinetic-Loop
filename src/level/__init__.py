@@ -2,9 +2,9 @@
 
 ### IMPORTS ###
 import random
-import math
-
 import pygame as pg
+
+from item import Item
 
 from util.space import pixel_distance
 from util import pathfind as pf
@@ -114,17 +114,25 @@ class Level(pg.Rect):
 
             # process player input
             elif check_input:
-                keys = pg.key.get_pressed()
+                pressed_keys = pg.key.get_pressed()
 
                 # adjust looking
-                cond1 = keys[eval("pg." + self.controls['look'][0])]
-                cond2 = self.looking and keys[eval("pg." + self.controls['unlook'][0])]
+                cond1 = pressed_keys[eval("pg." + self.controls["look"][0])]
+                cond2 = self.looking and pressed_keys[eval("pg." + self.controls['unlook'][0])]
                 if cond1 or cond2:
                     self.toggle_looking()
 
                 # wait
-                if keys[eval("pg." + self.controls['wait'][0])]:
+                if pressed_keys[eval("pg." + self.controls["wait"][0])]:
+                    self.player.heal(1)
                     self._take_entity_turns()
+
+                # grab item
+                if pressed_keys[eval("pg." + self.controls["grab"][0])]:
+                    item = self.get_game_object(self.player.tile_x, self.player.tile_y, Item)
+                    if item is not None:
+                        item.grab(self.player)
+                        self.log.add_message("Added " + item.info["name"] + " to inventory")
 
                 # look
                 if self.looking:
@@ -133,7 +141,7 @@ class Level(pg.Rect):
                 elif self.player.take_turn():
                     self._take_entity_turns()
 
-                if keys[eval("pg." + self.controls['fire'][0])]:
+                if pressed_keys[eval("pg." + self.controls['fire'][0])]:
                     if self.looking:
                         cursor_pos = self.cursor.tile_x, self.cursor.tile_y
                         self.player.attack_ranged(self.get(cursor_pos[0], cursor_pos[1]))
@@ -177,8 +185,6 @@ class Level(pg.Rect):
         for gameobj in self.game_objects.sprites():
             tile = self.get_tile(gameobj.tile_x, gameobj.tile_y)
             if tile is None:
-                print("Something's in the void......")
-                print("Coords: ", gameobj.tile_x, gameobj.tile_y, "\n")
                 continue
             tile_bgc = tile.colors[0]
             gameobj.image.set_bgc(tile_bgc)
@@ -221,16 +227,21 @@ class Level(pg.Rect):
 
     def get_game_object(self, tile_x, tile_y, tp=None):
         """ get any game object on the board of specified type """
-        search_coord = (tile_x, tile_y)
+        all_objects = self.get_all_game_objects(tile_x, tile_y, tp)
+        if len(all_objects) == 0:
+            return None
+        return all_objects[0]
 
+    def get_all_game_objects(self, tile_x, tile_y, tp=None):
+        """ get all game objects on the board of specified type """
+        all_objects = []
         for gameobj in self.game_objects:
             if gameobj is None:
                 continue
-            gameobj_coord = (gameobj.tile_x, gameobj.tile_y)
-            if search_coord == gameobj_coord:
+            if (tile_x, tile_y) == (gameobj.tile_x, gameobj.tile_y):
                 if tp is None or isinstance(gameobj, tp):
-                    return gameobj
-        return None
+                    all_objects.append(gameobj)
+        return all_objects
 
     def get_entity(self, tile_x, tile_y):
         """ this method shouldn't be necessary, but here we are. """
@@ -311,6 +322,10 @@ class Level(pg.Rect):
 
         rooms_only = []
         for room in self.rooms:
+            if self.player is not None:
+                player_coord = self.player.rect.left, self.player.rect.top
+                if room.collidepoint(player_coord[0], player_coord[1]):
+                    continue
             if not isinstance(room, Tunnel):
                 rooms_only.append(room)
 

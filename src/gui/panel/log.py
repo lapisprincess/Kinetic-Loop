@@ -86,7 +86,7 @@ class LogPanel(Panel):
             self.typing = False
 
         # delete
-        elif event.key == pg.K_BACKSPACE:
+        elif event.key == pg.K_BACKSPACE and len(self.type_txt) > 4:
             self.type_txt = self.type_txt[:-1]
         
         elif event.key == pg.K_BACKQUOTE: pass # ignore that char, thnx

@@ -9,13 +9,13 @@ setup: requirements.txt
 
 
 nofov:
-	python3 src/main.py nofov
+	python3 src/main.py stg nofov
 
-testroom:
-	python3 src/main.py testroom
+noents:
+	python3 src/main.py stg noents
 
-nofov-testroom:
-	python3 src/main.py nofov testroom
+nofov-noents:
+	python3 src/main.py stg nofov noents
 
 stg:
 	python3 src/main.py stg

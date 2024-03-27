@@ -1,13 +1,13 @@
 """ overarching game system"""
 
 ## IMPORTS
-import json
 import random
 import pygame as pg
 
 from level import Level, connect_floors, level_gen
 from tile import standard_tiles
-from entity import Entity, player, trait
+from entity import Entity, parse_entity_data, player, trait
+from item import Item
 
 from util import pathfind as pf, define_controls
 from util.debug import debug
@@ -17,17 +17,17 @@ from util.fov import fov_los
 from gui import GUI
 from gui.menu.mainmenu import MainMenu
 from gui.menu.gameover import GameOverMenu
+from gui.menu.inventory import Inventory
 
 
 ## CONSTANTS
 SCREEN_DIMENSION = 1024, 512
 PLAYER_BGC, PLAYER_FGC = pg.Color('green'), pg.Color('white')
 DATA_PATH = "data/"
-ENTITY_DATA_PATH = open("data/gameobjects/entity.json")
 controls = define_controls(DATA_PATH)
 
 class Game:
-    def __init__(self, setFOV, stg=False):
+    def __init__(self, setFOV, setEntities, stg=False):
 
         # determine if we're jumping straight into the game (stg)
         self.mode = "menu"
@@ -46,6 +46,7 @@ class Game:
         # make main menu
         self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts, self)
         self.gameovermenu = GameOverMenu(SCREEN_DIMENSION, self.all_fonts)
+        self.inventorymenu = None
         self.menu = self.mainmenu
 
         # cursor stuffs
@@ -57,20 +58,27 @@ class Game:
 
         # jump straight into generating a level
         if self.mode == "game":
-            self.setup_game(setFOV)
+            self.setup_game(setFOV, setEntities)
 
-    def setup_game(self, setFOV):
+    def setup_game(self, setFOV, setEntities):
         """ detailed 8-level dungeon generator """
 
         # set up player
         player_colors = PLAYER_BGC, PLAYER_FGC
         self.player = player.Player((0,4), colors=player_colors)
         self.player.traits.add(trait.controllable)
+        self.inventorymenu = Inventory(SCREEN_DIMENSION, self.all_fonts, self, self.player)
+        self.menu = self.inventorymenu
 
         # set up full dungeon
         self.all_levels = []
-        for i in range(1, 8):
-            new_name = "level" + str(i)
+        for i in range(1, 9):
+            if i in (1,2):
+                new_name = "Roots " + str(i)
+            elif i in (3,4,5,6):
+                new_name = "Trunk " + str(i-2)
+            elif i in (7,8):
+                new_name = "Crown " + str(i-6)
 
             # loop until we generate a fully connected floor
             # takes a while... but these rooms need to be clean
@@ -97,6 +105,11 @@ class Game:
         self.all_levels[self.current_level].add_gameobj(self.player)
         self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
 
+        # testing items here
+        random_floor = self.all_levels[0].get_random_floor()
+        test_item = Item((1,2), (random_floor.tile_x, random_floor.tile_y), pg.Color(255, 200, 200))
+        self.all_levels[0].add_gameobj(test_item)
+
         # gui initialization
         self.game_gui = GUI(SCREEN_DIMENSION, self.all_fonts, self.player.level)
         for level in self.all_levels: # link gui to levels
@@ -106,6 +119,8 @@ class Game:
         entity_templates = parse_entity_data(self.all_levels)
 
         # populate dungeon
+        if not setEntities:
+            return
         entities_so_far = []
         for i, level in enumerate(self.all_levels):
             entities_so_far += entity_templates[i]
@@ -155,11 +170,12 @@ class Game:
 
     def run_game(self):
         """ main game loop """
-        if pg.key.get_pressed()[pg.K_ESCAPE] and self.game_gui.menu is not None:
+        pressed_keys = pg.key.get_pressed()
+        if pressed_keys[pg.K_ESCAPE] and self.game_gui.menu is not None:
             self.game_gui.menu = None
 
         self.game_gui.change_level(self.player.level)
-
+ 
         check_input = False
 
         for event in pg.event.get():
@@ -170,12 +186,17 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_BACKQUOTE and not self.game_gui.log.typing:
                     self.game_gui.log.type_txt = "db> "
-                    self.game_gui.log.typing = True
-                if event.key == pg.K_RETURN and self.game_gui.log.typing:
+                    self.game_gui.log.typing = not self.game_gui.log.typing
+                elif event.key == pg.K_RETURN and self.game_gui.log.typing:
                     debug(self.player, self.game_gui.log, self.all_levels)
-                if self.game_gui.log.typing:
+                    self.game_gui.log.typing = not self.game_gui.log.typing
+                elif self.game_gui.log.typing:
                     self.game_gui.log.type(event)
-                check_input = True
+                elif event.key == eval("pg." + controls['menu_inventory'][0]):
+                    self.mode = "menu"
+                    self.inventorymenu.update_items(self.player)
+                    self.menu = self.inventorymenu
+                else: check_input = True
 
             # register scrolling
             if event.type == pg.MOUSEWHEEL:
@@ -220,39 +241,3 @@ class Game:
 
         return True
 
-def parse_entity_data(all_levels):
-    """ transform json data into entity templates """
-    level_entities = [[]]
-
-    # initialize output list
-    for i in all_levels:
-        level_entities.append([])
-
-    entities_data = json.load(ENTITY_DATA_PATH)["entities"]
-    for raw_entity_data in entities_data:
-
-        # gather preliminary data
-        entity_info = {}
-        entity_info["name"] = raw_entity_data["name"]
-        entity_info["description"] = raw_entity_data["description"]
-        entity_info["hp"] = raw_entity_data["hp"]
-        entity_sheet_coord = raw_entity_data["tile"]
-
-        # create entity
-        new_entity = Entity(
-            sheet_coord =entity_sheet_coord,
-            tile_coord =None,
-            level =all_levels[raw_entity_data["level"]],
-            info_intake =entity_info
-        )
-
-        # handle traits
-        entity_traits = raw_entity_data["traits"]
-        for entity_trait in entity_traits:
-            new_trait = trait.all_traits[entity_trait]
-            new_entity.traits.add(new_trait)
-
-        # stow entity
-        level_entities[raw_entity_data["level"]-1].append(new_entity)
-
-    return level_entities

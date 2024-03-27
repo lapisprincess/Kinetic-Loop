@@ -11,7 +11,7 @@ from gui import Panel
 TREE_IMG = pg.image.load("data/tree.jpg")
 
 class MainMenu(Panel):
-    def __init__(self, screen_dimensions: tuple[int, int], fonts: pg.font.Font, gameobj):
+    def __init__(self, screen_dimensions: tuple[int, int], fonts: pg.font.Font, system):
         Panel.__init__(self, (0, 0), screen_dimensions, fonts)
 
         # initialize static pieces
@@ -26,16 +26,16 @@ class MainMenu(Panel):
 
         # set up buttons
         render = self.fonts["li"].render("Play game", None, (0, 0, 0))
-        self.play_game_button = Button(
+        play_game_button = Button(
             pixel_coord= (860, 100),
             pixel_dimen= (100, 50),
             color= (255, 255, 255),
-            target= gameobj,
+            target= system,
             function= play_game,
             text= render,
         )
-        self.play_game_button.draw(self)
-        self.buttons.append(self.play_game_button)
+        play_game_button.draw(self)
+        self.buttons.append(play_game_button)
 
 
 ### PLAY GAME BUTTON ###
@@ -49,5 +49,5 @@ def play_game(game_obj):
     game_obj.clock.tick(30)
 
     # start loading game
-    game_obj.setup_game(True)
+    game_obj.setup_game(True, True)
     game_obj.mode = "game"

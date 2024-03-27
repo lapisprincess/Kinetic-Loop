@@ -45,6 +45,8 @@ class GameObj(pg.sprite.Sprite):
         self.seethrough = False
         self.traversable = False
 
+        self.is_player = False
+
     def update(self):
         """ update to help render correctly """
         self.rect.x = self.tile_x * graphic.tile_width

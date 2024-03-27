@@ -1,11 +1,14 @@
 """ universal entity module """
 
 ## IMPORTS
+import json
 import pygame as pg
 
 from util import graphic
 import util.direction as directionality
 from util.fov import fov_los
+
+from entity import trait
 
 from prop.stairs import Stairs
 
@@ -15,6 +18,8 @@ from gameobj import GameObj
 ## CONSTANTS
 UNARMED_DMG = 5
 FOV_WIDTH = 6
+
+ENTITY_DATA_PATH = open("data/gameobjects/entity.json")
 
 
 ## ENTITY CLASS
@@ -41,7 +46,7 @@ class Entity(GameObj):
 
         # store crucial information
         if "hp" not in self.info:
-            self.info["hp"] = 0
+            self.info["hp"] = 1
         if "name" not in self.info:
             self.info["name"] = "Sprout"
 
@@ -182,6 +187,13 @@ class Entity(GameObj):
         target.info["hp"] -= dmg
         target.update()
 
+    def heal(self, amount):
+        newval = self.info["hp"] + amount
+        if "max_hp" in self.info and newval > self.info["max_hp"]:
+            self.info["hp"] = self.info["max_hp"]
+        else:
+            self.info["hp"] = newval
+
 
     ## GETTERS
     def get_info(self):
@@ -226,3 +238,41 @@ class Entity(GameObj):
             new_entity.traits.add(trait)
         
         return new_entity
+
+
+def parse_entity_data(all_levels):
+    """ transform json data into entity templates """
+    level_entities = [[]]
+
+    # initialize output list
+    for i in all_levels:
+        level_entities.append([])
+
+    entities_data = json.load(ENTITY_DATA_PATH)["entities"]
+    for raw_entity_data in entities_data:
+
+        # gather preliminary data
+        entity_info = {}
+        entity_info["name"] = raw_entity_data["name"]
+        entity_info["description"] = raw_entity_data["description"]
+        entity_info["hp"] = raw_entity_data["hp"]
+        entity_sheet_coord = raw_entity_data["tile"]
+
+        # create entity
+        new_entity = Entity(
+            sheet_coord =entity_sheet_coord,
+            tile_coord =None,
+            level =all_levels[raw_entity_data["level"]],
+            info_intake =entity_info
+        )
+
+        # handle traits
+        entity_traits = raw_entity_data["traits"]
+        for entity_trait in entity_traits:
+            new_trait = trait.all_traits[entity_trait]
+            new_entity.traits.add(new_trait)
+
+        # stow entity
+        level_entities[raw_entity_data["level"]-1].append(new_entity)
+
+    return level_entities

@@ -34,9 +34,11 @@ class Player(Entity):
 
         self.info["name"] = "Tilda"
         self.info["hp"] = 15
-        self.info["roots"] = 0
+        self.info["max_hp"] = self.info["hp"]
 
         self.visible = True
+
+        self.is_player = True
 
     def update(self):
         """ constant updater """

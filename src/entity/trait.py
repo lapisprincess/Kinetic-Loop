@@ -8,7 +8,6 @@ import util.pathfind as pf
 
 from prop.stairs import Stairs
 
-from entity.player import Player
 
 
 ## TRAIT CLASS
@@ -105,10 +104,10 @@ def ranged(parent, target):
 
 
 def target_nearby(parent):
-    """ Target any nearby entity (only player for now) """
+    """ Target any nearby entity (only player, for now?) """
     if parent.target is None:
         for thing in parent.fov:
-            if isinstance(thing, Player):
+            if thing.is_player:
                 parent.target = thing
                 return True
     for gameobj in parent.get_surrounding_game_objects():

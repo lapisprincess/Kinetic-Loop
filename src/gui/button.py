@@ -53,5 +53,7 @@ class Button(pg.Surface):
 
 ### SMALL BUTTON FUNCTIONS ###
 def toggle_looking(level):
-    if type(level) == level: 
-        level.toggle_looking()
+    level.toggle_looking()
+
+def back_to_game(level):
+    level.mode = "game"

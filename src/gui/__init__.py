@@ -71,12 +71,9 @@ class GUI():
 
     def draw(self, surface):
         """ general drawer for all GUI elements """
-
-
-        # draw panels
         self.level.draw(surface)
         self.log.draw(surface)
-        self.info.draw(surface, self.li, self.h1)
+        self.info.draw(surface, self.li, self.h1, self.level.rect.name)
 
     def change_level(self, new_level):
         """ adjust the gui to reflect the current level """

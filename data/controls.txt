@@ -23,6 +23,7 @@ select = K_RETURN
 unlook = K_ESCAPE
 wait = K_PERIOD
 fire = K_f
+grab = K_g
 
 
 
