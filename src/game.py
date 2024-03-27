@@ -154,6 +154,8 @@ class Game:
         self.screen.fill("black")
         self.menu.update()
         self.menu.draw(self.screen)
+        if isinstance(self.menu, Inventory):
+            self.inventorymenu.update_items(self.player)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:

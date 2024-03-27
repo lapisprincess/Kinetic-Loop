@@ -248,7 +248,7 @@ def parse_entity_data(all_levels):
     for i in all_levels:
         level_entities.append([])
 
-    entities_data = json.load(ENTITY_DATA_PATH)["entities"]
+    entities_data = json.load(ENTITY_DATA_PATH)
     for raw_entity_data in entities_data:
 
         # gather preliminary data

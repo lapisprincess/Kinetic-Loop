@@ -19,3 +19,11 @@ class Item(GameObj):
         self.visible = False
         self.tile_x, self.tile_y = 0, 0
         player.inventory.append(self)
+
+    def drop(self, player):
+        if self not in player.inventory:
+            return
+        self.visible = True
+        self.tile_x = player.tile_x
+        self.tile_y = player.tile_y
+        player.inventory.remove(self)

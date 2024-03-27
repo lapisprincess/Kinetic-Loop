@@ -1,4 +1,4 @@
-{"entities": [
+[
     {
         "name": "Adoring Fan",
         "id": "adoring_fan",
@@ -19,5 +19,71 @@
         "level": 2,
         "tile": [5, 0],
         "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    {
+        "name": "Leafling",
+        "id": "leafling",
+        "description": "Every game needs a mascot character!",
+        "hp": 15,
+        "damage": 6,
+        "level": 2,
+        "tile": [5, 0],
+        "traits": ["wandering", "hostile"]
     }
-]}
+]

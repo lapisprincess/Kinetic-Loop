@@ -10,7 +10,7 @@ class Button(pg.Surface):
         pixel_coord :tuple[int, int],
         pixel_dimen :tuple[int, int],
         color :pg.Color,
-        function,
+        function =None,
         target =None,
         text :pg.Surface =None
     ):
@@ -41,6 +41,8 @@ class Button(pg.Surface):
 
     def click(self):
         mouse_pos = pg.mouse.get_pos()
+        if self.function is None:
+            return
         if self.rect.collidepoint(mouse_pos):
             self.function(self.target)
 
