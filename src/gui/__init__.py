@@ -128,10 +128,10 @@ class GUI():
     def click_button(self):
         """ register mouse clicking """
         mouse_pos = pg.mouse.get_pos()
-
-        # buttons should only be located in the menu panel or in a popout
+        if self.exit_button is not None and self.exit_button.rect.collidepoint(mouse_pos):
+            self.exit_button.click()
+        if self.menu.buttons is None: 
+            return
         for button in self.menu.buttons:
             if button.rect.collidepoint(mouse_pos):
                 button.click()
-        if self.exit_button is not None and self.exit_button.rect.collidepoint(mouse_pos):
-            self.exit_button.click()

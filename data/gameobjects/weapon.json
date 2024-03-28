@@ -1,23 +1,65 @@
 [
-
-    { "name": "Dirk",
-        "level": 1,
-        "damage": 15,
-        "type": "melee"
+    { 
+        "name": "Dirk",
+        "id": "dirk",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
     },
 
-    { "name": "Adventurer's Scabbard",
-        "level": 2,
-        "damage": 20,
-        "type": "melee"
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
     },
 
-    { "name": "Oak Bow",
-        "damage": 10,
-        "type": "ranged"
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
     },
 
-    {
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
+    },
 
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
+    },
+
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
+    },
+
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
+    },
+
+    { 
+        "name": "",
+        "id": "",
+        "damage": 0,
+        "level": 0,
+        "effects": ["melee"]
     }
 ]

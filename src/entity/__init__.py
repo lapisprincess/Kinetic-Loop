@@ -262,7 +262,7 @@ def parse_entity_data(all_levels):
         new_entity = Entity(
             sheet_coord =entity_sheet_coord,
             tile_coord =None,
-            level =all_levels[raw_entity_data["level"]],
+            level =all_levels[raw_entity_data["level"]-1],
             info_intake =entity_info
         )
 

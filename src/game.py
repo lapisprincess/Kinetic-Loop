@@ -46,7 +46,7 @@ class Game:
         # make main menu
         self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts, self)
         self.gameovermenu = GameOverMenu(SCREEN_DIMENSION, self.all_fonts)
-        self.inventorymenu = None
+        self.inventorymenu = Inventory(SCREEN_DIMENSION, self.all_fonts, self)
         self.menu = self.mainmenu
 
         # cursor stuffs
@@ -67,7 +67,6 @@ class Game:
         player_colors = PLAYER_BGC, PLAYER_FGC
         self.player = player.Player((0,4), colors=player_colors)
         self.player.traits.add(trait.controllable)
-        self.inventorymenu = Inventory(SCREEN_DIMENSION, self.all_fonts, self, self.player)
         self.menu = self.inventorymenu
 
         # set up full dungeon
@@ -75,10 +74,16 @@ class Game:
         for i in range(1, 9):
             if i in (1,2):
                 new_name = "Roots " + str(i)
+                floor = standard_tiles["root floor"]
+                wall = standard_tiles["root wall"]
             elif i in (3,4,5,6):
                 new_name = "Trunk " + str(i-2)
+                floor = standard_tiles["trunk floor"]
+                wall = standard_tiles["trunk wall"]
             elif i in (7,8):
                 new_name = "Crown " + str(i-6)
+                floor = standard_tiles["crown floor"]
+                wall = standard_tiles["crown wall"]
 
             # loop until we generate a fully connected floor
             # takes a while... but these rooms need to be clean
@@ -90,7 +95,7 @@ class Game:
                     name=new_name
                 )
                 standard_tiles
-                level_gen.generate_floor(new_level, 8, standard_tiles["grass"], standard_tiles["woodwall"])
+                level_gen.generate_floor(new_level, 8, floor, wall)
                 new_level.kill_orphans()
                 valid = new_level.validate()
                 if not valid:
@@ -177,7 +182,7 @@ class Game:
             self.game_gui.menu = None
 
         self.game_gui.change_level(self.player.level)
- 
+
         check_input = False
 
         for event in pg.event.get():

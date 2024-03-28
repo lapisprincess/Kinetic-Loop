@@ -91,23 +91,51 @@ dark1 = pg.color.Color(80, 98, 58)
 dark2 = pg.color.Color(41, 75, 41)
 light1 = pg.color.Color(209, 241, 191)
 light2 = pg.color.Color(120, 148, 97)
+grey = pg.color.Color(100, 100, 100)
+
+black = pg.color.Color(0,   0,   0)
+white = pg.color.Color(255, 255, 255)
+red = pg.color.Color(255, 0, 0)
+green = pg.color.Color(0, 255, 0)
+blue = pg.color.Color(0, 0, 255)
 
 # tiles
+root_floor_color = (pg.color.Color(90, 45, 45), pg.color.Color(60, 30, 30))
+root_floor = Tile("Root-packed mulch", (0,0), (3,2), "floor", root_floor_color)
+root_wall_color = (pg.color.Color(50, 20, 20), pg.color.Color(30, 10, 10))
+root_wall = Tile("Tangled roots", (0,0), (3,1), "wall", root_wall_color)
+
+trunk_floor_color = (pg.color.Color(130, 95, 95), pg.color.Color(140, 105, 105))
+trunk_floor = Tile("Ringwood floor", (0,0), (15,0), "floor", trunk_floor_color)
+trunk_wall_color = (pg.color.Color(90,60,60), pg.color.Color(80,50,50))
+trunk_wall = Tile("Bark wall", (0,0), (0,0), "wall", trunk_wall_color)
+
+crown_floor_color = (pg.color.Color(140,160,140), pg.color.Color(150,120,120))
+crown_floor = Tile("Intertwining branches", (0,0), (12,7), "floor", crown_floor_color)
+crown_wall_color = (pg.color.Color(130,150,130), pg.color.Color(100,120,100))
+crown_wall = Tile("Tangled leaves", (0,0), (10,2), "wall", crown_wall_color)
+
+
+# old ones
+cobble_floor = Tile('Cobble floor', (0,0), (9, 15), 'floor', (grey, black))
+cobble_wall = Tile('Cobble wall', (0,0), (0, 11), 'wall', (grey, black))
 woodwall = Tile('Weirdwood bark', (0,0), (3, 1), 'wall', (dark1, dark2))
 grass = Tile('Shimmergrass', (0,0), (2, 2), 'floor', (dark2, light1))
 
 
-
-# old ones
-grey       = pg.color.Color(100, 100, 100)
-black      = pg.color.Color(0,   0,   0)
-white      = pg.color.Color(255, 255, 255)
-cobble_floor = Tile('Cobble floor', (0,0), (9, 15), 'floor', (grey, black))
-cobble_wall  = Tile('Cobble wall', (0,0), (0, 11), 'wall', (grey, black))
-
+# all standard tiles
 standard_tiles = {
-    "cobble_floor": Tile('Cobble floor', (0,0), (9, 15), 'floor', (grey, black)),
-    "cobble_wall": Tile('Cobble wall', (0,0), (0, 11), 'wall', (grey, black)),
-    "woodwall": Tile('Weirdwood bark', (0,0), (3, 1), 'wall', (dark1, dark2)),
-    "grass": Tile('Shimmergrass', (0,0), (2, 2), 'floor', (dark2, light1))
+    "cobble_floor": cobble_floor,
+    "cobble_wall": cobble_wall,
+    "woodwall": woodwall,
+    "grass": grass,
+
+    "root floor": root_floor,
+    "root wall": root_wall,
+
+    "trunk floor": trunk_floor,
+    "trunk wall": trunk_wall,
+
+    "crown floor": crown_floor,
+    "crown wall": crown_wall,
 }

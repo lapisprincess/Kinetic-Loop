@@ -1,19 +1,17 @@
 [
-    {
-        "name": "Adoring Fan",
-        "id": "adoring_fan",
-        "description": "This fanatic can't get enough of the player!",
+    { "name": "Large beetle",
+        "id": "beetle_large",
+        "description": "Chewing deep into The Tree are these somewhat magical beetles, enlarged as a byproduct of the druids' magic.",
         "hp": 5,
         "damage": 3,
         "level": 1,
-        "tile": [6, 6],
+        "tile": [5, 9],
         "traits": ["wandering", "hostile"]
     },
 
-    {
-        "name": "Leafling",
+    { "name": "Leafling",
         "id": "leafling",
-        "description": "Every game needs a mascot character!",
+        "description": "The leaves falling from the crown have swept through enchanted winds, giving them life, letting them breathe.",
         "hp": 15,
         "damage": 6,
         "level": 2,
@@ -21,69 +19,63 @@
         "traits": ["wandering", "hostile"]
     },
 
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
+    { "name": "Sleepless druid",
+        "id": "druid_sleepless",
+        "description": "Bound to reality, unable to even meditate, these sleepless monks pace with haunting thoughts, ready to practice their magic on any potential target.",
         "hp": 15,
         "damage": 6,
-        "level": 2,
+        "level": 3,
+        "tile": [4, 6],
+        "traits": ["wandering", "hostile"]
+    },
+
+    { "name": "Lost adventurer",
+        "id": "adventurer",
+        "description": "Not all who try to climb The Tree succeed. This soul is lost, unable to distinguish their own kin from the enemies who wander alongside you.",
+        "hp": 15,
+        "damage": 6,
+        "level": 4,
+        "tile": [1, 0],
+        "traits": ["wandering", "hostile"]
+    },
+
+    { "name": "Giant beetle",
+        "id": "beetle_giant",
+        "description": "The beetles of all creatures seemed particularly attuned to the druid's magic. The larger ones were kept as pets, making their way as far up as The Tree's crown.",
+        "hp": 15,
+        "damage": 6,
+        "level": 5,
+        "tile": [11, 14],
+        "traits": ["wandering", "hostile"]
+    },
+
+    { "name": "Sleeping druid",
+        "id": "druid_sleeping",
+        "description": "The barrier between waking and sleeping seems lost to these magicians of the mind who draw power from their deep sleep. This one someday hopes to achieve a blissful state of dreaming.",
+        "hp": 15,
+        "damage": 6,
+        "level": 6,
+        "tile": [13, 2],
+        "traits": ["wandering", "hostile"]
+    },
+
+    { "name": "Golden Leafling",
+        "id": "leafling_golden",
+        "description": "Many leaves cling to The Tree's crown, growing old in the magic wind. They learned to detach and reattach themselves at will so that they can walk alongside their creators.",
+        "hp": 15,
+        "damage": 6,
+        "level": 7,
         "tile": [5, 0],
         "traits": ["wandering", "hostile"]
     },
 
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
+    { "name": "Dreaming druid",
+        "id": "druid_dreaming",
+        "description": "These powerful creatures have lived decades in a deep sleep to the point of blissful dreaming, granting them access to a sacred well of ancestral strength.",
         "hp": 15,
         "damage": 6,
-        "level": 2,
-        "tile": [5, 0],
-        "traits": ["wandering", "hostile"]
-    },
-
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
-        "hp": 15,
-        "damage": 6,
-        "level": 2,
-        "tile": [5, 0],
-        "traits": ["wandering", "hostile"]
-    },
-
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
-        "hp": 15,
-        "damage": 6,
-        "level": 2,
-        "tile": [5, 0],
-        "traits": ["wandering", "hostile"]
-    },
-
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
-        "hp": 15,
-        "damage": 6,
-        "level": 2,
-        "tile": [5, 0],
-        "traits": ["wandering", "hostile"]
-    },
-
-    {
-        "name": "Leafling",
-        "id": "leafling",
-        "description": "Every game needs a mascot character!",
-        "hp": 15,
-        "damage": 6,
-        "level": 2,
-        "tile": [5, 0],
+        "level": 8,
+        "tile": [14, 7],
         "traits": ["wandering", "hostile"]
     }
 ]
