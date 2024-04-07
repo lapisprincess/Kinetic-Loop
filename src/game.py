@@ -7,7 +7,7 @@ import pygame as pg
 from level import Level, connect_floors, level_gen
 from tile import standard_tiles
 from entity import Entity, parse_entity_data, player, trait
-from item import Item
+from item import Item, parse_item_data
 
 from util import pathfind as pf, define_controls
 from util.debug import debug
@@ -18,6 +18,7 @@ from gui import GUI
 from gui.menu.mainmenu import MainMenu
 from gui.menu.gameover import GameOverMenu
 from gui.menu.inventory import Inventory
+from gui.menu.objectinfo import ObjectMenu
 
 
 ## CONSTANTS
@@ -37,6 +38,7 @@ class Game:
         # game utilities
         self.screen = pg.display.set_mode(SCREEN_DIMENSION)
         self.clock = pg.time.Clock()
+        self.screen_dimension = SCREEN_DIMENSION
 
         # fonts
         li_font = pg.font.Font("data/font.otf", size=14)
@@ -110,18 +112,14 @@ class Game:
         self.all_levels[self.current_level].add_gameobj(self.player)
         self.player.fov = fov_los(self.all_levels[self.current_level], self.player)
 
-        # testing items here
-        random_floor = self.all_levels[0].get_random_floor()
-        test_item = Item((1,2), (random_floor.tile_x, random_floor.tile_y), pg.Color(255, 200, 200))
-        self.all_levels[0].add_gameobj(test_item)
-
         # gui initialization
         self.game_gui = GUI(SCREEN_DIMENSION, self.all_fonts, self.player.level)
         for level in self.all_levels: # link gui to levels
             level.log = self.game_gui.log
 
-        # collect all entity data
+        # collect all data
         entity_templates = parse_entity_data(self.all_levels)
+        item_templates = parse_item_data(self.all_levels)
 
         # populate dungeon
         if not setEntities:
@@ -139,6 +137,20 @@ class Game:
                     random_tile = room.get_random_floor()
                     random_coord = random_tile.tile_x, random_tile.tile_y
                 level.add_gameobj(random_entity.clone(), random_coord)
+
+        items_so_far = []
+        for i, level in enumerate(self.all_levels):
+            items_so_far += item_templates[i]
+            for room in level.get_all_rooms():
+                if random.randint(0, 9) == 0:
+                    continue # 1/9 chance no item
+                random_item = items_so_far[random.randint(0, len(items_so_far)-1)]
+                random_tile = room.get_random_floor()
+                random_coord = random_tile.tile_x, random_tile.tile_y
+                while level.get_game_object(random_coord[0], random_coord[1]) != None:
+                    random_tile = room.get_random_floor()
+                    random_coord = random_tile.tile_x, random_tile.tile_y
+                level.add_gameobj(random_item.clone(), random_coord)
 
 
     def loop(self):

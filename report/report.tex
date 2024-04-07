@@ -1,8 +1,16 @@
 \documentclass[sigconf,nonacm]{acmart}
 
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+
 \begin{document}
 
-\title{Roguelike Development from Scratch}
+\title{Roguelike Development Fundamentals from Scratch}
 \author{Matilda Lerner}
 \date{\today}
 \maketitle
@@ -12,43 +20,48 @@
 \newpage
 \pagenumbering{arabic}
 
-Here's my random garbage <3
+\section{Abstract}
+\textbf {My amazing abstract} would go here!
 
-\newpage
-\section{Layout}
+\section{Introduction}
+\textbf {Every aspect of a game} stems from its mechanics, a notion which fascinates me to no end. For this reason, I endeavored to design a complex video game from scratch as my senior thesis, studying and applying various algorithms in order to create the foundation for deep and engaging gameplay.\\
 
-\subsection{Abstract}
-A short (max 150 words) summary of the paper. It’s usually easier to write this last, once the structure of the paper has taken shape.
+\textbf {My decision to apply this learning} to a “traditional rogue-like” stems from my longtime fascination with the genre. Multiple of my favorite games can be classified as nothing other than a traditional rogue-like while boasting distinct mechanics which set them apart from any other game, or creative endeavor for that matter. My hope was to understand at least the foundation of how these games operate, applying them to my own attempt at a traditional rogue-like.\\
 
-\subsection{Introduction}
-Explain the context and motivation for your project. What domain are you working in? What is the subject of your project? Why is this a problem worth solving? Include a very brief description of your approach. With some luck, you can probably steal most of this from your project proposal.
+\textbf {What defines a rogue-like} is the forcing of a player back to the start of the game whenever they lose, a mechanic called permadeath, a shorthand for permanent death. The earliest rogue-likes strived to capture the essence of tabletop role-playing games by simulating every detail of every game object to create a world deep with possibilities, using permadeath as a means of forming a bond between a player and their character. Contemporary rogue-likes, while maintaining the permadeath qualifier, have foregone complexity in favor of quicker and more reactive mechanics. In other words, contemporary rogue-likes are more akin to their arcade ancestors, while contemporary developers of traditional rogue-likes continue to experiment with deep mechanics (or, in the case of some developers, introducing these deep mechanics to the current generation).\\
 
-\subsection{Background and Related Work}
-What other work has been done before? Do similar systems or research exist? How does your project fit into a greater context, perhaps building on what has come before? Be sure to reference other work properly, and include those references at the end of the paper.
+\textbf {Finding this medium} where developers are actively experimenting with the scope of what video games mechanics are capable of is what draws me to traditional rogue likes, and why I wanted to learn how to develop the fundamentals of one. There are of course tools and libraries available to facilitate the development of a rogue like, but I chose to forego them in the hope of learning how these core mechanics function. This was the foundation into which I entered the development of my game, which I have chosen to call Leaflings.\\
 
-\subsection{Implementation / Methods}
-If you did an implementation project, describe its architecture and how it works. For a research project, explain your research method. Feel free to document failed attempts as well as the final path taken. This is likely to be the largest subsection in the writeup of an implementation project. Just the facts please: this subsection should not make claims about how well your system works or how it compares to other efforts. That material goes in the next two subsections.
+\pagebreak
 
-\subsection{Evaluation / Results and Analysis}
-How well does your system work, or what did you figure out? In an implementation project, you might report on either a short user study explaining the system in use, or give the results of tests demonstrating the effectiveness of your implementation. For research projects, present and analyze data that supports your arguments. It wouldn’t be surprising for this to be the largest subsection in a research project writeup.
+\section{Background and Related Work}
 
-\subsection{Discussion}
-The previous two subsections described your work in detail, and the related work subsection talked about what others have done. This subsection should put your results in context — how does your contribution support, refute, or extend previous work? What is the significance of your project? Opinions are fine here, as long as you make a coherent argument to back them up (e.g. “We feel that this system offers a superior experience for the user since it crashes less often than Microsoft Blurb.”). Your discussion will be stronger if you give an honest comparison of your project to existing work (e.g. “It is true that Microsoft Blurb offers better security than our system, but security was not our primary emphasis for this proof-of-concept implementation, and could be added at later date.”).
+\textbf {The concept of a “rogue-like” was defined} in the 80s, as many developers were releasing derivatives of the original \textit {Rogue}, released in 1980, due to its appealing flexible nature and open-ended design. The genre still sees refinement and interesting adaptations with many rogue-likes being released by indie developers every year, some of which garner massive acclaim and success.\\
 
-\subsection{Future Work}
-What are the next steps, either for you or for people who might build on your work?
+\textbf {Contemporary rogue-likes} tend to give players an incentive to continue playing between losses by allowing special unlocks, regardless of a round’s victory. If a player makes significant progress but dies before reaching the game’s end, their progress in that round must be lost (as dictated by rogue-like tradition), but they should still be rewarded for getting far. This reward both incentivizes the player to try again, and it also allows the developers to make the later parts of their game more difficult, with the knowledge that the player can come back with steadily better unlocks. (\textit{Risk of Rain})\\
 
-\subsection{Conclusion}
-Include some concluding remarks. Summarize and reiterate what you see as the key points from your writeup. Basically you’re using the old “tell them what you’re going to tell them, tell them, and then tell them what you told them” structure in the hopes that your point really got through.
+\textbf {Contemporary developers of traditional rogue-likes} tend to adhere to the archaic fundamental mechanics of ancient rogue-likes. Some games find a hybrid space, such as \textit{Tales of Maj’Eyal} which conforms to traditional gameplay while allowing progress between games. The most noteworthy contemporary rogue-like developers, however, tend to stick to the fundamentals which made original rogue-likes so fun. (\textit{ToME}, \textit{Cogmind})\\
 
-\subsection{Acnowledgments}
-This subsection is used to acknowledge the people or organizations that provided significant help or inspiration. It might not be relevant to your writeup. In the real world you’d thank the funding agencies that supported your work, the reviewers who gave feedback on drafts of the paper, and any other contributors. If you did an implementation project, you might consider acknowledging the authors of any packages or libraries you used, etc.
+\textbf {My project adheres} more to the latter methodology. While I am fond of many contemporary rogue-likes, the mechanics required would have been too complex for me to work at a low level, forcing me to use a game engine, which would have foregone the learning experience. As such, much of my design methodology was strictly bound to foundational rogue-like mechanics. My goal with this project was not necessarily to create a game that could be considered a worthy contribution to its genre, but instead to understand the fundamentals of how to develop a rogue-like so that I may someday apply my learning to a more noteworthy game. 
 
-\subsection{References}
-A properly formatted list of references. This will be substantial in a research report, but less so for an implementation project. The references can be construed fairly broadly in computer science—in addition to journal articles, books, and conference proceedings, papers often reference web pages, tutorials, etc. Note that this is different from a bibliography, which lists things that you’ve read but that are not necessarily referenced in your paper. All of the entries in this subsection should be referenced at least once in the body of your paper.
+\pagebreak
 
-\subsection{Appendices}
-You might consider adding an appendix (or several) if you have tables of data, long listings of source code, or other supporting information that’s too long to insert into the body of the paper, but that’s relevant to your project. These will not be counted against the 8-10 page limit.
+
+\section{Implementation / Methods}
+
+\section{Evaluation / Results and Analysis}
+
+\section{Discussion}
+
+\section{Future Work}
+
+\section{Conclusion}
+
+\section{Acnowledgments}
+
+\section{References}
+
+\section{Appendices}
 
 
 \end{document}

@@ -100,6 +100,12 @@ class Player(Entity):
             return False
         return True
 
+    def drop(self, item):
+        for inventory_object in self.inventory:
+            if item == inventory_object:
+                self.inventory.remove(inventory_object)
+
+
     def travel(self):
         """ fast travel to travel_dest """
 

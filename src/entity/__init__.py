@@ -190,8 +190,13 @@ class Entity(GameObj):
     def heal(self, amount):
         newval = self.info["hp"] + amount
         if "max_hp" in self.info and newval > self.info["max_hp"]:
+            amount = self.info["max_hp"] - self.info["hp"]
+            if amount > 1:
+                self.level.log.add_message(self.info["name"] + " healed for " + str(amount) + "!")
             self.info["hp"] = self.info["max_hp"]
         else:
+            if amount > 1:
+                self.level.log.add_message(self.info["name"] + " healed for " + str(amount) + "!")
             self.info["hp"] = newval
 
 

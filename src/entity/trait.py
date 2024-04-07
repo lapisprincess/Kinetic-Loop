@@ -9,16 +9,12 @@ import util.pathfind as pf
 from prop.stairs import Stairs
 
 
-
-## TRAIT CLASS
 class Trait:
-    """ TODO """
     def __init__(self, priority, method):
         self.priority = priority
         self.method = method
 
     def act(self, parent):
-        """ TODO """
         return self.method(parent)
 
 

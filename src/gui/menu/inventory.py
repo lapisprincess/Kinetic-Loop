@@ -16,6 +16,7 @@ class Inventory(Menu):
         system, 
     ):
         Menu.__init__(self, "Your stuff: ", screen_dimensions, fonts, system)
+        self.system = system
 
 
     def update_items(self, player: Player):
@@ -42,8 +43,8 @@ class Inventory(Menu):
                 pixel_coord= (400, height-15),
                 pixel_dimen= (80, 40), 
                 color= pg.Color(100, 100, 100), 
-                target= None,
-                function= None,
+                target= self.system,
+                function= item.view,
                 text= render
             )
             view_button.draw(self)

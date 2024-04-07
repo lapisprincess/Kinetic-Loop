@@ -41,7 +41,7 @@ class InfoPanel(Panel):
 
 
 
-    def _draw_info(self, info, surface, li_font, h1_font, half = False):
+    def _draw_info(self, info, surface, li_font, h1_font, half = False, is_player = False):
         if half: 
             mod = round(self.mid.height / 2)
             overhead = 0
@@ -49,11 +49,24 @@ class InfoPanel(Panel):
             mod = 0
             overhead = h1_font.size('')[1] + 10
 
+        head = 10
         name = info["name"]
+        xpos = self.mid.left + self.mid.width * 0.2
+        while ' ' in name:
+            if h1_font.size(name)[0] > self.mid.width-xpos:
+                word = name[:name.index(' ')]
+                name = name[name.index(' ') + 1:]
+                text = h1_font.render(word, False, COLOR)
+                coord = (
+                    self.mid.left + self.mid.width * 0.2, 
+                    overhead + self.mid.top + mod + head
+                )
+                surface.blit(text, coord)
+                head += h1_font.size(name)[1]
         text = h1_font.render(name, False, COLOR)
         coord = (
             self.mid.left + self.mid.width * 0.2, 
-            overhead + self.mid.top + mod + 10
+            overhead + self.mid.top + mod + head
         )
         surface.blit(text, coord)
         
@@ -65,24 +78,28 @@ class InfoPanel(Panel):
         surface.blit(image, coord)
 
         # draw rest
-        depth = 50
-        for key in info:
-            if key not in ("hp"): continue
-            val = str(info[key])
-            key += ':'
-            key_render = li_font.render(key, False, COLOR)
-            val_render = li_font.render(val, False, COLOR)
-            key_coord = (
-                self.mid.left + self.mid.width * 0.10,
-                overhead + self.mid.top + mod + depth
+        head += 30
+        key = "HP:"
+        val = str(info["hp"])
+        key_render = li_font.render(key, False, COLOR)
+        val_render = li_font.render(val, False, COLOR)
+        key_coord = (
+            self.mid.left + self.mid.width * 0.10,
+            overhead + self.mid.top + mod + head
+        )
+        val_coord = (
+            self.mid.left + self.mid.width * 0.70,
+            overhead + self.mid.top + mod + head
+        )
+        surface.blit(key_render, key_coord)
+        surface.blit(val_render, val_coord)
+        if is_player:
+            max_hp = "/" + str(info["max_hp"])
+            coord = (
+                self.mid.left + self.mid.width * 0.70 + 15,
+                overhead + self.mid.top + mod + 50
             )
-            val_coord = (
-                self.mid.left + self.mid.width * 0.70,
-                overhead + self.mid.top + mod + depth
-            )
-            surface.blit(key_render, key_coord)
-            surface.blit(val_render, val_coord)
-            depth += 20
+            surface.blit(max_hp, coord)
 
 
     def set_info(self, info):

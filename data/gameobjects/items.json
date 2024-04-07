@@ -1,73 +1,11 @@
 [
     {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
-    },
-
-    {
-        "name": "",
-        "id": "",
-        "description": "",
-        "ammount": 0,
-        "level": 0,
-        "effects": []
+        "name": "Healing potion",
+        "id": "healing",
+        "description": "The Tree's magic is so strong that even its dead branches and tangled roots and form a restorative tea.",
+        "ammount": 15,
+        "tile": [1,2],
+        "level": 1,
+        "effect": "healing"
     }
 ]

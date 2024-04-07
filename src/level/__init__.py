@@ -201,9 +201,9 @@ class Level(pg.Rect):
                 out = [tile_at_cursor.get_info()]
             else: out = []
 
-            entity_at_cursor = self.get(cursor_x, cursor_y, Entity)
-            if entity_at_cursor is not None and entity_at_cursor.visible:
-                out.append(entity_at_cursor.get_info())
+            gameobj_at_cursor = self.get_game_object(cursor_x, cursor_y, Entity)
+            if gameobj_at_cursor is not None and gameobj_at_cursor.visible:
+                out.append(gameobj_at_cursor.get_info())
 
         else: out = [self.player.get_info()]
 
