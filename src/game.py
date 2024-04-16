@@ -18,7 +18,6 @@ from gui import GUI
 from gui.menu.mainmenu import MainMenu
 from gui.menu.gameover import GameOverMenu
 from gui.menu.inventory import Inventory
-from gui.menu.objectinfo import ObjectMenu
 
 
 ## CONSTANTS
@@ -133,7 +132,7 @@ class Game:
                 random_entity = entities_so_far[random.randint(0, len(entities_so_far)-1)]
                 random_tile = room.get_random_floor()
                 random_coord = random_tile.tile_x, random_tile.tile_y
-                while level.get_game_object(random_coord[0], random_coord[1]) != None:
+                while level.get_game_object(random_coord[0], random_coord[1]) is not None:
                     random_tile = room.get_random_floor()
                     random_coord = random_tile.tile_x, random_tile.tile_y
                 level.add_gameobj(random_entity.clone(), random_coord)
@@ -147,7 +146,7 @@ class Game:
                 random_item = items_so_far[random.randint(0, len(items_so_far)-1)]
                 random_tile = room.get_random_floor()
                 random_coord = random_tile.tile_x, random_tile.tile_y
-                while level.get_game_object(random_coord[0], random_coord[1]) != None:
+                while level.get_game_object(random_coord[0], random_coord[1]) is not None:
                     random_tile = room.get_random_floor()
                     random_coord = random_tile.tile_x, random_tile.tile_y
                 level.add_gameobj(random_item.clone(), random_coord)
@@ -216,6 +215,7 @@ class Game:
                     self.inventorymenu.update_items(self.player)
                     self.menu = self.inventorymenu
                 else: check_input = True
+
 
             # register scrolling
             if event.type == pg.MOUSEWHEEL:
