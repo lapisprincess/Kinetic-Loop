@@ -20,3 +20,5 @@ makefile
 main.spec
 /build
 /dist
+
+/.venv
