@@ -23,6 +23,4 @@ main.spec
 
 /.venv
 
-**/*.png
-**/*.jpg
 **/*.aseprite
