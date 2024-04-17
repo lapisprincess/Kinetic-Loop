@@ -22,3 +22,7 @@ main.spec
 /dist
 
 /.venv
+
+**/*.png
+**/*.jpg
+**/*.aseprite
