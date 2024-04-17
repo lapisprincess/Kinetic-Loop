@@ -16,7 +16,9 @@ from util.fov import fov_los
 
 from gui import GUI
 from gui.menu.mainmenu import MainMenu
+from gui.menu.controls import ControlsMenu
 from gui.menu.gameover import GameOverMenu
+from gui.menu.victory import VictoryMenu
 from gui.menu.inventory import Inventory
 
 
@@ -46,7 +48,9 @@ class Game:
 
         # make main menu
         self.mainmenu = MainMenu(SCREEN_DIMENSION, self.all_fonts, self)
+        self.controlsmenu = ControlsMenu(SCREEN_DIMENSION, self.all_fonts)
         self.gameovermenu = GameOverMenu(SCREEN_DIMENSION, self.all_fonts)
+        self.victorymenu = VictoryMenu(SCREEN_DIMENSION, self.all_fonts)
         self.inventorymenu = Inventory(SCREEN_DIMENSION, self.all_fonts, self)
         self.menu = self.mainmenu
 
@@ -95,7 +99,6 @@ class Game:
                     controls, visibility=setFOV,
                     name=new_name
                 )
-                standard_tiles
                 level_gen.generate_floor(new_level, 8, floor, wall)
                 new_level.kill_orphans()
                 valid = new_level.validate()
@@ -176,6 +179,8 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return False
+            if event.type == pg.KEYDOWN and event.key == 27:
+                self.mode = "game"
 
             # manage mouse behavior
             if event.type == pg.MOUSEBUTTONDOWN:

@@ -11,11 +11,11 @@ FIELD_IMG = pg.image.load("data/leafy_field.jpg")
 
 class Menu(Panel):
     def __init__(
-        self, 
+        self,
         header: str,
-        screen_dimensions: tuple[int, int], 
-        fonts: pg.font.Font, 
-        system, 
+        screen_dimensions: tuple[int, int],
+        fonts: pg.font.Font,
+        system,
     ):
         Panel.__init__(self, (0, 0), screen_dimensions, fonts)
 
@@ -37,11 +37,11 @@ class Menu(Panel):
 
         render = self.fonts["li"].render("Return to game", None, pg.Color(0, 0, 0))
         exit_button = Button(
-            pixel_coord= (self.rect_width-49, self.rect_ypos), 
-            pixel_dimen= (150, 50), 
-            color= pg.Color(200, 255, 200), 
-            target= system, 
-            function= back_to_game, 
+            pixel_coord= (self.rect_width-49, self.rect_ypos),
+            pixel_dimen= (150, 50),
+            color= pg.Color(200, 255, 200),
+            target= system,
+            function= back_to_game,
             text= render
         )
         exit_button.draw(self)
