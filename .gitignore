@@ -22,5 +22,9 @@ main.spec
 /dist
 
 /.venv
+/leaflings
+/leaflings_venv
+/pygame
+/src/pygame
 
 **/*.aseprite

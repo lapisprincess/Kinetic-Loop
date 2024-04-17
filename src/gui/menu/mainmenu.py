@@ -37,11 +37,25 @@ class MainMenu(Panel):
         play_game_button.draw(self)
         self.buttons.append(play_game_button)
 
+        render = self.fonts["li"].render("Controls", None, (0, 0, 0))
+        controls_button = Button(
+            pixel_coord= (860, 200),
+            pixel_dimen= (100, 50),
+            color= (255, 255, 255),
+            target= system,
+            function= view_controls,
+            text= render,
+        )
+        controls_button.draw(self)
+        self.buttons.append(controls_button)
+
+def view_controls(game_obj):
+    game_obj.menu = game_obj.controlsmenu
 
 ### PLAY GAME BUTTON ###
 loading_screen = pg.image.load("data/loading_screen.png")
 def play_game(game_obj):
-    
+
     # pull up loading screen
     game_obj.screen.fill("black")
     game_obj.screen.blit(loading_screen, (0, 0))

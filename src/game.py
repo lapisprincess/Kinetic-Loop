@@ -180,7 +180,10 @@ class Game:
             if event.type == pg.QUIT:
                 return False
             if event.type == pg.KEYDOWN and event.key == 27:
-                self.mode = "game"
+                if isinstance(self.menu, ControlsMenu):
+                    self.menu = self.mainmenu
+                else:
+                    self.mode = "game"
 
             # manage mouse behavior
             if event.type == pg.MOUSEBUTTONDOWN:
