@@ -23,6 +23,7 @@ main.spec
 
 /.venv
 /leaflings
+leaflings
 /leaflings_venv
 /pygame
 /src/pygame
